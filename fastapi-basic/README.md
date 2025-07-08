@@ -2,6 +2,8 @@
 
 A minimal FastAPI server demonstrating all common HTTP methods with tests.
 
+![](assets/fastapi-basic-openapi.png)
+ 
 ## Setup and Usage
 
 This project uses `uv` for dependency management.
