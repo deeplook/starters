@@ -1,0 +1,24 @@
+# Ignore Git
+.git
+.gitignore
+
+# Ignore Python artifacts
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.python-version
+
+# Ignore virtual environment
+.venv
+
+# Ignore test files
+test_*.py
+
+# Ignore IDE/editor files
+.idea
+.vscode
+
+# Ignore build artifacts
+.pytest_cache
+uv.lock
