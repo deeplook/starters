@@ -1,0 +1,58 @@
+# Init project
+init:
+    if [ ! -f pyproject.toml ]; then uv init; fi
+
+# Set up the pyproject.toml file as needed
+# Especially the Python version (requires-python = ">=3.12")
+
+# Create a virtual environment with a Python version passed as argument
+setup python_version="3.12":
+    if [ ! -d .venv ]; then uv venv --python {{ python_version }}; fi
+    . .venv/bin/activate
+    uv sync --extra dev
+
+# Add one or more packages
+add *packages:
+    uv add {{ packages }}
+
+# Install the app + dev dependencies
+install-dev:
+    uv pip install -e .[dev]
+
+# Uninstall the app + dev dependencies
+uninstall-dev:
+    uv pip uninstall .[dev]
+
+# Start via Typer CLI
+cli-start-server ENV_PATH="./fastapibasic.env":
+    .venv/bin/fastapibasic start --FAPIBASE_ENV_PATH={{ ENV_PATH }}
+
+# Alias to start via Typer CLI
+start ENV_PATH="./fastapibasic.env":
+    just cli-start-server {{ ENV_PATH }}
+
+# Show configuration parameters as JSON
+cli-config-server ENV_PATH="./fastapibasic.env":
+    .venv/bin/fastapibasic config --FAPIBASE_ENV_PATH={{ ENV_PATH }}
+
+# Alias to show configuration parameters as JSON
+config ENV_PATH="./fastapibasic.env":
+    just cli-config-server {{ ENV_PATH }}
+
+# Lint the project
+lint:
+    ruff check . -v
+
+# Clean the environment
+clean:
+    rm -rf .venv
+
+# Run tests
+test:
+    . .venv/bin/activate
+    PYTHONPATH=. .venv/bin/coverage run -m pytest
+
+# Generate coverage HTML report
+coverage-html:
+    . .venv/bin/activate
+    coverage html

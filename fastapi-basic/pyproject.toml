@@ -3,6 +3,8 @@ name = "fastapi-basic"
 version = "0.1.0"
 description = "A minimal, tested FastAPI server implementing all HTTP methods."
 readme = "README.md"
+authors = [{ name="FRC", email="frchalaoux@icloud.com" },{ name="DG", email="gherman@darwin.in-berlin.de"}]
+license = { file = "LICENSE" }
 requires-python = ">=3.12"
 dependencies = [
     "anyio==3.7.1",
@@ -14,4 +16,22 @@ dependencies = [
     "httpx>=0.28.1",
     "pytest>=8.4.1",
     "pytest-asyncio>=1.0.0",
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+fastapibasic = "fastapibasic.cli:app"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = ["fastapibasic"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+fasapibasic = [
+    "static/images/*",
+    "lang/**",
 ]
