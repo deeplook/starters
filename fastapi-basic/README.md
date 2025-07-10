@@ -56,6 +56,8 @@ This command maps the host port `9000` on the container port `8000`.
 
 ## Run Testsuite
 
+This will run tests on a real server on a temporary free port.
+
 ```bash
 ❯ uv run pytest
 ====================== test session starts ======================

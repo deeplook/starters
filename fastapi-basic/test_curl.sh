@@ -1,6 +1,12 @@
 #! /usr/bin/env bash
 
-PORT=8000
+# Load environment variables from .env file
+export $(cat .env | grep -v '^#' | xargs)
+
+PORT=${PORT:-8001}
+
+echo "Using port defined in .env: $PORT"
+echo
 
 echo "Get all items"
 curl -X GET http://127.0.0.1:$PORT/items && echo
