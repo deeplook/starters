@@ -47,9 +47,9 @@ Build and run the application using Docker:
 
 ```bash
 docker compose up -d
-# or
-docker build -t fastapi-basic .
-docker run -d -p 9000:8000 --env-file ./.env --name fastapi-basic-app fastapi-basic
+source .env && curl -X GET http://127.0.0.1:$PORT/items
+./test_curl.sh
+docker compose down
 ```
 
 This command maps the host port `9000` on the container port `8000`.

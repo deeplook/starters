@@ -3,7 +3,7 @@
 # Load environment variables from .env file
 export $(cat .env | grep -v '^#' | xargs)
 
-PORT=${PORT:-8001}
+PORT=${PORT}
 
 echo "Using port defined in .env: $PORT"
 echo

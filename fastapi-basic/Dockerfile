@@ -8,6 +8,9 @@ WORKDIR /app
 RUN useradd --create-home appuser
 USER appuser
 
+# Add user's local bin to PATH
+ENV PATH="/home/appuser/.local/bin:${PATH}"
+
 # Copy the dependencies file.
 COPY --chown=appuser:appuser pyproject.toml .
 
@@ -24,4 +27,4 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Run the application
-CMD ["python", "main.py"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
