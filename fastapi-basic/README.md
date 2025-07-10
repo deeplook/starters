@@ -52,8 +52,6 @@ source .env && curl -X GET http://127.0.0.1:$PORT/items
 docker compose down
 ```
 
-This command maps the host port `9000` on the container port `8000`.
-
 ## Run Testsuite
 
 This will run tests on a real server on a temporary free port.
