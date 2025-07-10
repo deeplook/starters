@@ -44,8 +44,13 @@ terraform apply
 ### Use the instance
 
 ```bash
-# terraform output -json > tf_outputs.json
+# Create environment variables file
 terraform output -json | jq -r 'to_entries[] | "export \(.key)=\(.value.value)"' > tf_outputs.env
+
+# Open webserver
+source tf_outputs.env && open http://$instance_public_ip
+
+# Run command via SSH
 source tf_outputs.env && ssh -i $private_key_file ec2-user@$instance_public_ip uname -a
 > Linux ip-10-0-1-160.eu-central-1.compute.internal 6.1.140-154.222.amzn2023.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Jun  2 15:11:40 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
 ```
