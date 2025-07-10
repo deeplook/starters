@@ -11,3 +11,8 @@ wheels/
 
 # Environment variables
 .env
+
+# VSCode
+.vscode/
+.vs/
+*.code-workspace
