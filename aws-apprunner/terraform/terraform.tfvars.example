@@ -1,0 +1,38 @@
+# AWS Configuration
+aws_region = "eu-central-1"
+
+# ECR Configuration
+ecr_repository_name = "node-app-repo"
+image_tag           = "latest"
+docker_build_platform = "linux/amd64"
+
+# App Runner Service Configuration
+app_service_name          = "node-app-service"
+app_autoscale_config_name = "app-autoscale-config"
+app_port                  = "3000"
+app_health_check_path     = "/health"
+
+# App Runner Instance Configuration
+app_instance_cpu    = "512"
+app_instance_memory = "1024"
+
+# App Runner Autoscaling Configuration
+app_max_concurrency = 80
+app_min_size        = 1
+app_max_size        = 10
+
+# App Runner Health Check Configuration
+app_health_check_interval = 20
+app_health_check_timeout  = 10
+app_healthy_threshold     = 2
+app_unhealthy_threshold   = 5
+
+# Application Configuration
+app_environment_variables = {
+  NODE_ENV = "production"
+}
+
+# Tags
+app_tags = {
+  Name = "NodeAppService"
+}

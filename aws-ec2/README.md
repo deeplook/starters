@@ -60,8 +60,6 @@ source tf_outputs.env && ssh -i $private_key_file ec2-user@$instance_public_ip u
 ```bash
 terraform destroy
 
-# manual clean-up state files and the ssh key file
-rm tf_outputs.env
-rm -f terraform.tfstate terraform.tfstate.backup .terraform.lock.hcl
-rm -rf .terraform
+# Manual clean-up local state files
+make clean
 ```
