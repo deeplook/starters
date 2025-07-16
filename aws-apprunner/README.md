@@ -1,6 +1,6 @@
 # Terraform AWS App Runner Deployment
 
-This project uses Terraform to deploy a containerized application to AWS App Runner, with the ECR repository managed as a separate component.
+This project builds a Docker image for a NodeJS web application, pushes it to AWS ECR and deploys it on AWS App Runner, all managed by Terraform.
 
 ## Project Structure
 
@@ -31,8 +31,9 @@ These instructions will guide you through setting up the infrastructure from scr
 
 ### Prerequisites
 
--   Terraform CLI installed.
--   AWS credentials configured for your environment.
+- Terraform CLI installed.
+- AWS credentials configured for your environment.
+- NPM to build the NodeJS application.
 
 ### 1. Configure Your Deployment
 
@@ -105,3 +106,14 @@ This script will:
 ```bash
 ./teardown.sh
 ```
+
+## Next Steps
+
+This project provides a solid foundation for a containerized application on AWS. Here are some ways you can extend it:
+
+- **Integrate a Database**: Connect your Node.js application to a managed database like Amazon RDS (for relational data) or DynamoDB (for NoSQL). You'll need to update the application code and add the necessary database resources to your Terraform configuration.
+- **Add a CI/CD Pipeline**: Automate your deployment process using a CI/CD service like GitHub Actions. Configure a workflow to build and push your Docker image to ECR and run `terraform apply` whenever you push changes to your main branch.
+- **Secure Secret Management**: Instead of passing configuration as environment variables, use AWS Secrets Manager to store and retrieve sensitive data like database credentials or API keys.
+- **Configure a Custom Domain**: Associate a custom domain with your App Runner service for a professional, production-ready URL.
+- **Enable Observability**: Enhance monitoring and debugging by sending custom metrics to CloudWatch, or enable AWS X-Ray for end-to-end tracing of requests through your application.
+- **Connect to a VPC**: For applications that need to access resources in a private network, configure a VPC connector for your App Runner service.
