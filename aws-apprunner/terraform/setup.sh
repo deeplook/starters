@@ -23,6 +23,10 @@ else
   echo "Workspace 'apprunner' already exists."
 fi
 
+echo "Creating ECR repository..."
+terraform workspace select ecr
+terraform apply --auto-approve
+
 terraform workspace select default > /dev/null
 
 echo ""
