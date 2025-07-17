@@ -70,3 +70,11 @@ docker push "$ECR_IMAGE_URI"
 
 echo ""
 echo "✅ Successfully pushed image to ECR: $ECR_IMAGE_URI"
+
+# --- Create and deploy App Runner service ---
+echo "Creating App Runner service..."
+terraform apply --auto-approve -var="create_apprunner_service=true"
+
+echo ""
+echo "🚀 Deployment started for App Runner service (this may take a few minutes)."
+echo "Service URL: https://$(terraform output -raw app_service_url)"

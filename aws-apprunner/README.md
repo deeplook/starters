@@ -9,9 +9,9 @@ The project is organized into two main Terraform modules:
 -   `modules/ecr`: Manages the AWS Elastic Container Registry (ECR) repository.
 -   `modules/apprunner`: Manages the AWS App Runner service.
 
-This project uses **Terraform Workspaces** to maintain separate state files for the `ecr` and `apprunner` resources. This allows for independent management of the ECR repository and the App Runner service.
+This project uses a single Terraform workspace to manage both the ECR and App Runner resources. The creation of the App Runner service is controlled by a variable, allowing for a two-step deployment process.
 
--   The `apprunner` workspace has a dependency on the output of the `ecr` workspace. Specifically, it reads the `repository_url` from the `ecr` state file to configure the App Runner service.
+-   The `apprunner` module has a dependency on the output of the `ecr` module. Specifically, it reads the `repository_url` from the `ecr` state to configure the App Runner service.
 
 ## Configuration
 
@@ -19,11 +19,11 @@ All configuration for this project is managed in a single file.
 
 1.  **Create a configuration file:** Copy the example file to create your own local configuration.
     ```bash
-    cp terraform.tfvars.example terraform.tfvars
+    cp terraform/terraform.tfvars.example terraform/terraform.tfvars
     ```
     Terraform will automatically load variables from `terraform.tfvars`. This file is ignored by Git, so your local settings will not be checked in.
 
-2.  **Edit `terraform.tfvars`:** Open the `terraform.tfvars` file and adjust the values to match your requirements (e.g., change the `aws_region`, `app_service_name`, or `docker_build_platform`).
+2.  **Edit `terraform.tfvars`:** Open the `terraform/terraform.tfvars` file and adjust the values to match your requirements (e.g., change the `aws_region`, `app_service_name`, or `docker_build_platform`).
 
 ## Getting Started
 
@@ -34,6 +34,7 @@ These instructions will guide you through setting up the infrastructure from scr
 - Terraform CLI installed.
 - AWS credentials configured for your environment.
 - NPM to build the NodeJS application.
+- Docker installed and running.
 
 ### 1. Configure Your Deployment
 
@@ -41,49 +42,40 @@ Before you begin, create and review your `terraform.tfvars` file as described in
 
 ### 2. Run the Setup Script
 
-This script will initialize Terraform and create the necessary `ecr` and `apprunner` workspaces for you.
+This script will initialize Terraform and create the ECR repository.
 
 ```bash
+cd terraform
 ./setup.sh
 ```
 
-### 3. Deploy the ECR Repository
+### 3. Build, Push, and Deploy
 
-Select the `ecr` workspace and deploy the ECR repository.
+The `push_image.sh` script performs the following actions:
+- Installs NodeJS dependencies.
+- Builds the Docker image from the `../NodeApp` directory.
+- Pushes the image to your new ECR repository.
+- Deploys the App Runner service.
 
-```bash
-terraform workspace select ecr && terraform apply --auto-approve
-```
-
-### 4. Build and Push Your Docker Image
-
-The App Runner service needs a Docker image to deploy. The included script will build the image from the `../NodeApp` directory and push it to your new ECR repository.
+Note: The App Runner service is created only once with the first push. Subsequent pushes to the same image tag will automatically trigger a new deployment.
 
 ```bash
 ./push_image.sh
 ```
 
-### 5. Deploy the App Runner Service
-
-Now that the image exists in ECR, you can deploy the App Runner service.
-
-```bash
-terraform workspace select apprunner && terraform apply --auto-approve
-```
-
 ## Smoke Testing
 
-After the `apprunner` workspace has been successfully applied, you can perform a smoke test to ensure the service is running.
+After the `push_image.sh` script has completed, you can perform a smoke test to ensure the service is running.
 
 1.  **Get the Service URL:**
 
-    The App Runner service URL is available as an output of the `apprunner` workspace. You can retrieve it with the following command:
+    The App Runner service URL is available as an output of the Terraform configuration. You can retrieve it with the following command:
 
     ```bash
     terraform output apprunner_service_url
     ```
 
-2.  **Test the Endpoint:**
+2.  **Test the Application:**
 
     Use `curl` or your web browser to send a request to the service URL.
 
@@ -101,7 +93,6 @@ To destroy all the resources created by this project, you can run the included t
 This script will:
 - Destroy the App Runner service.
 - Destroy the ECR repository (including any images).
-- Delete the `apprunner` and `ecr` workspaces.
 
 ```bash
 ./teardown.sh

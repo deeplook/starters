@@ -11,29 +11,17 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "terraform_remote_state" "ecr" {
-  count = terraform.workspace == "apprunner" ? 1 : 0
-
-  backend = "local"
-
-  config = {
-    path = "terraform.tfstate.d/ecr/terraform.tfstate"
-  }
-}
-
 module "ecr" {
-  count = terraform.workspace == "ecr" ? 1 : 0
-
   source              = "./modules/ecr"
   ecr_repository_name = var.ecr_repository_name
 }
 
 module "apprunner" {
-  count = terraform.workspace == "apprunner" ? 1 : 0
+  count = var.create_apprunner_service ? 1 : 0
 
   source                    = "./modules/apprunner"
   aws_region                = var.aws_region
-  app_image_identifier      = terraform.workspace == "apprunner" ? "${data.terraform_remote_state.ecr[0].outputs.repository_url}:${var.image_tag}" : ""
+  app_image_identifier      = "${module.ecr.repository_url}:${var.image_tag}"
   app_environment_variables = var.app_environment_variables
   app_service_name          = var.app_service_name
   app_autoscale_config_name = var.app_autoscale_config_name

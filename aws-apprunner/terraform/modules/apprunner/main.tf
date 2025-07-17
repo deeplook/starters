@@ -40,17 +40,17 @@ resource "aws_apprunner_service" "app_service" {
 
   source_configuration {
     image_repository {
-      image_identifier      = var.app_image_identifier
-      image_repository_type = "ECR"
+      image_identifier      = var.app_image_identifier != null ? var.app_image_identifier : "public.ecr.aws/aws-containers/hello-app-runner:latest"
+      image_repository_type = var.app_image_identifier != null ? "ECR" : "ECR_PUBLIC"
       image_configuration {
         port                            = var.app_port
         runtime_environment_variables = var.app_environment_variables
       }
     }
     authentication_configuration {
-      access_role_arn = aws_iam_role.apprunner_role.arn
+      access_role_arn = var.app_image_identifier != null ? aws_iam_role.apprunner_role.arn : null
     }
-    auto_deployments_enabled = true
+    auto_deployments_enabled = var.app_image_identifier != null ? true : false
   }
 
   instance_configuration {

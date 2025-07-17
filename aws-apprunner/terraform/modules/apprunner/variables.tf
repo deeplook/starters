@@ -11,6 +11,7 @@ variable "aws_region" {
 variable "app_image_identifier" {
   description = "The full URI of the Docker image in ECR (e.g., 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-repo:latest)."
   type        = string
+  default     = null
 }
 
 # Defines the environment variables for the App Runner service.

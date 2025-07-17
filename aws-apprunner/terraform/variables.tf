@@ -92,3 +92,9 @@ variable "app_tags" {
   description = "Tags for the App Runner service."
   type        = map(string)
 }
+
+variable "create_apprunner_service" {
+  description = "Whether to create the App Runner service."
+  type        = bool
+  default     = false
+}
