@@ -1,0 +1,48 @@
+# ------------------------------------------------------------------------------
+# REQUIRED VARIABLES
+# ------------------------------------------------------------------------------
+#
+# These variables must be set in your 'terraform.tfvars' file.
+
+# A unique name for your project, used for tagging and naming resources.
+# Example: "my-web-app"
+project_name = "my-web-app"
+
+# The AWS region where resources will be created.
+# Example: "us-east-1"
+aws_region = "eu-central-1"
+
+# The tag of the Docker image to deploy.
+# Example: "v1.2.3"
+docker_image_tag = "latest"
+
+# ------------------------------------------------------------------------------
+# OPTIONAL VARIABLES
+# ------------------------------------------------------------------------------
+#
+# The following variables have default values but can be overridden.
+
+# The deployment environment (e.g., 'dev', 'staging', 'prod').
+# Default: "dev"
+# environment = "dev"
+
+# The ID of the VPC to deploy into. If not provided, the default VPC will be used.
+# Default: null
+# vpc_id = "vpc-0123456789abcdef0"
+
+# The desired number of tasks to run for the service.
+# Default: 2
+# desired_task_count = 2
+
+# The port the container listens on.
+# Default: 80
+# container_port = 80
+
+# The number of CPU units to reserve for the container.
+# Default: 256
+# container_cpu = 256
+
+# The amount of memory (in MiB) to reserve for the container.
+# Default: 512
+# container_memory = 512
+
