@@ -6,11 +6,11 @@ The setup is designed to deploy a custom dummy Python application using MonsterU
 
 ## Prerequisites
 
-1.  **AWS Account**: An AWS account with the necessary permissions.
-2.  **AWS CLI (Configured)**: Your AWS credentials should be configured locally, typically via `aws configure`.
-3.  **Docker**: Docker must be installed and running to build the container image.
-4.  **Terraform CLI**: Ensure you have the Terraform CLI installed.
-5.  **jq**: A tool for processing JSON files.
+1.  **AWS Account**: An [AWS](https://aws.amazon.com/) account with the necessary permissions.
+2.  **AWS CLI (Configured)**: [awscli](https://aws.amazon.com/cli/) Your AWS credentials should be configured locally, typically via `aws configure`.
+3.  **Docker**: [Docker](https://www.docker.com/) must be installed and running to build the container image.
+4.  **Terraform CLI**: Ensure you have the [Terraform](https://developer.hashicorp.com/terraform) CLI installed ([OpenTofu](https://opentofu.org/) will also work).
+5.  **jq**: A lightweight and flexible command-line JSON processor, [jq](https://jqlang.org/) is nice to have, but not essential.
 
 ## Usage
 
@@ -56,4 +56,28 @@ The setup is designed to deploy a custom dummy Python application using MonsterU
 To destroy all the resources created by this project, run `terraform destroy` from within the `terraform` directory:
 ```sh
 terraform destroy
+```
+
+```mermaid
+graph TD
+    subgraph "Developer's Machine"
+        A[Developer] -- Writes code --> B(Python App & Dockerfile)
+        B -- Builds & Pushes --> C{ECR Repository}
+        A -- Runs terraform apply --> D{Terraform}
+    end
+
+    subgraph "AWS Cloud"
+        D -- Provisions --> E(VPC, Subnets, SGs)
+        D -- Provisions --> F(ECS Cluster, Service, Task Def)
+        C -- Provides image to --> F
+        F -- Runs --> G["ECS Tasks (Containers)"]
+        G -- Sends logs/metrics --> H{CloudWatch}
+        I[Users] -- HTTP Requests --> J(Application Load Balancer)
+        J -- Forwards traffic --> G
+        H -- Triggers --> K(Auto-scaling Policy)
+        K -- Adjusts --> F
+    end
+
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style I fill:#f9f,stroke:#333,stroke-width:2px
 ```
