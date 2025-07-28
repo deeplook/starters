@@ -1,0 +1,15 @@
+# Example configuration for clibro.
+# To use this, copy it to the path shown by `clibro config show` and rename it to `config.toml`.
+# Then, uncomment and edit the values you want to change.
+
+# The logging level.
+# Options are: "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+# Default is "INFO".
+# log_level = "DEBUG"
+
+# The path to the log file.
+# If this is not set, logs will be sent to the console (stderr).
+# Example:
+# log_file = "/var/log/clibro.log"
+# On Windows, you might use:
+# log_file = "C:\Users\YourUser\AppData\Local\clibro\clibro.log"

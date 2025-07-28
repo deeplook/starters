@@ -1,0 +1,78 @@
+[project]
+name = "clibro"
+version = "0.1.0"
+description = "A minimal example Python package to be used as a library and shell command"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "typer>=0.12.4",
+    "platformdirs>=4.2.2",
+    "pydantic>=2.8.2",
+    "pydantic-settings>=2.4.0",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Other Audience",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "License :: OSI Approved :: MIT License",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-cov>=5.0.0",
+    "pre-commit>=3.7.1",
+    "mypy>=1.11.0",
+    "python-json-logger>=2.0.7",
+    "ruff>=0.12.3",
+    "sphinx>=7.4.0",
+    "sphinx-rtd-theme>=2.0.0",
+    "myst-parser>=3.0.1",
+    "sphinx-nefertiti>=0.2.2",
+]
+
+[project.scripts]
+clibro = "clibro.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/clibro"]
+
+[tool.ruff]
+line-length = 119
+exclude = [".venv"]
+
+[tool.ruff.lint]
+# For a full list of rules, see https://docs.astral.sh/ruff/rules/
+select = [
+    "E",    # pycodestyle errors
+    "F",    # Pyflakes
+    "I",    # isort
+    "ANN",  # flake8-annotations
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["clibro"]
+
+[tool.coverage.run]
+source = ["src/clibro"]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.coverage.xml]
+output = "coverage.xml"
