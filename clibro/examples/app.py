@@ -2,7 +2,7 @@
 An example of how to use the project programmatically as a library.
 
 This script demonstrates how a host application can set up its own logging
-and capture the log messages from the library.
+and capture the log messages from the library..
 """
 
 import logging
