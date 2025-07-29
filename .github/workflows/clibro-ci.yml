@@ -52,8 +52,14 @@ jobs:
       - name: Create virtual environment
         run: uv venv
 
-      - name: Install, lint, and test
-        run: make all
+      - name: Install dependencies
+        run: make install
+
+      - name: Lint
+        run: make lint
+
+      - name: Test
+        run: make test
 
       - name: Build and test distribution
         run: make test-dist
