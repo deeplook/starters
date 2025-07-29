@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'clibro/**'
+      - '.github/workflows/clibro/ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'clibro/**'
+      - '.github/workflows/clibro/ci.yml'
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Test against all supported Python versions declared in pyproject.toml
+        python-version: ["3.12", "3.13"]
+
+    # Set the working directory to the clibro project
+    defaults:
+      run:
+        working-directory: ./clibro
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      # Cache the uv virtual environment and global package cache
+      - name: Cache uv
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            clibro/.venv
+          key: ${{ runner.os }}-${{ matrix.python-version }}-uv-${{ hashFiles('clibro/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.python-version }}-uv-
+
+      - name: Create virtual environment
+        run: uv venv
+
+      - name: Install, lint, and test
+        run: make all
+
+      - name: Build and test distribution
+        run: make test-dist
