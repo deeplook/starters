@@ -98,6 +98,22 @@ This script will:
 ./teardown.sh
 ```
 
+## End-to-End Testing
+
+To ensure the entire deployment pipeline is working correctly, an end-to-end test script is provided. This script automates the setup, deployment, verification, and teardown processes.
+
+To run the E2E test, execute the following command from the `terraform` directory:
+```bash
+./test_e2e.sh
+```
+The script will:
+1.  Create the ECR repository.
+2.  Build and push the Docker image.
+3.  Deploy the App Runner service.
+4.  Poll the service's health check endpoint until it is healthy.
+5.  Run a series of smoke tests against the deployed application.
+6.  Automatically tear down all created resources.
+
 ## Next Steps
 
 This project provides a solid foundation for a containerized application on AWS. Here are some ways you can extend it:
