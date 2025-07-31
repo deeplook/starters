@@ -1,9 +1,18 @@
 # FastAPI Basic Starter
 
+Below are the Markdown lines for badges representing FastAPI and uv, using the for-the-badge style consistent with your previous badges. Both FastAPI and uv have logos available in Shields.io via SimpleIcons, so these badges will include their respective logos. I’ve also included the updated full set of badges, incorporating FastAPI and uv alongside the existing ones (Docker, Terraform, Python, AWS, Bash, AWS EC2, AWS S3, Node.js, FastHTML, MonsterUI).
+text
+## Technologies Used
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![Python](https://img.shields.io/badge/python-%2314354C.svg?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-%23009688.svg?style=for-the-badge&logo=fastapi&logoColor=white)
+![uv](https://img.shields.io/badge/uv-%2300A3B0.svg?style=for-the-badge&logo=uv&logoColor=white)
+![Shell](https://img.shields.io/badge/Shell-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
+
 A minimal FastAPI server demonstrating all common HTTP methods with tests.
 
 ![](assets/fastapi-basic-openapi.png)
- 
+
 ## Setup and Usage
 
 This project uses `uv` for dependency management.
@@ -64,7 +73,7 @@ rootdir: /path/to/fastapi-basic
 configfile: pyproject.toml
 plugins: anyio-3.7.1, asyncio-1.0.0
 asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collected 24 items                                              
+collected 24 items
 
 test_real.py ............                                 [ 50%]
 test_testclient.py ............                           [100%]
