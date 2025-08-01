@@ -9,8 +9,6 @@ import time
 import httpx
 import pytest
 
-from main import Item
-
 
 def get_free_port():
     """Finds a free port on the host machine."""
@@ -73,7 +71,6 @@ def reset_state(live_server_url):
 
 @pytest.mark.asyncio
 async def test_read_items(client: httpx.AsyncClient, reset_state):
-
     response = await client.get("/items")
     assert response.status_code == 200
     # The order might not be guaranteed, so we sort by id
@@ -85,7 +82,6 @@ async def test_read_items(client: httpx.AsyncClient, reset_state):
 
 @pytest.mark.asyncio
 async def test_read_item(client: httpx.AsyncClient, reset_state):
-
     # First, create an item to ensure it exists
     response = await client.post(
         "/items", json={"id": 1, "name": "Test Item", "description": "A test item"}
@@ -99,14 +95,12 @@ async def test_read_item(client: httpx.AsyncClient, reset_state):
 
 @pytest.mark.asyncio
 async def test_read_item_not_found(client: httpx.AsyncClient, reset_state):
-
     response = await client.get("/items/999")
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_create_item(client: httpx.AsyncClient, reset_state):
-
     response = await client.post(
         "/items",
         json={"id": 3, "name": "Item 3", "description": "This is the third item."},
@@ -119,7 +113,6 @@ async def test_create_item(client: httpx.AsyncClient, reset_state):
 
 @pytest.mark.asyncio
 async def test_update_item(client: httpx.AsyncClient, reset_state):
-
     response = await client.post(
         "/items", json={"id": 1, "name": "Test Item", "description": "A test item"}
     )
@@ -139,7 +132,6 @@ async def test_update_item(client: httpx.AsyncClient, reset_state):
 
 @pytest.mark.asyncio
 async def test_update_item_not_found(client: httpx.AsyncClient, reset_state):
-
     response = await client.put(
         "/items/999", json={"id": 999, "name": "Non-existent item"}
     )
@@ -148,7 +140,6 @@ async def test_update_item_not_found(client: httpx.AsyncClient, reset_state):
 
 @pytest.mark.asyncio
 async def test_patch_item(client: httpx.AsyncClient, reset_state):
-
     response = await client.post(
         "/items", json={"id": 1, "name": "Test Item", "description": "A test item"}
     )
@@ -161,14 +152,12 @@ async def test_patch_item(client: httpx.AsyncClient, reset_state):
 
 @pytest.mark.asyncio
 async def test_patch_item_not_found(client: httpx.AsyncClient, reset_state):
-
     response = await client.patch("/items/999", json={"name": "Non-existent item"})
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_delete_item(client: httpx.AsyncClient, reset_state):
-
     response = await client.post(
         "/items", json={"id": 1, "name": "Test Item", "description": "A test item"}
     )
@@ -180,14 +169,12 @@ async def test_delete_item(client: httpx.AsyncClient, reset_state):
 
 @pytest.mark.asyncio
 async def test_delete_item_not_found(client: httpx.AsyncClient, reset_state):
-
     response = await client.delete("/items/999")
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_options_items(client: httpx.AsyncClient, reset_state):
-
     response = await client.options("/items")
     assert response.status_code == 200
     assert "GET" in response.json()["methods"]
@@ -196,7 +183,6 @@ async def test_options_items(client: httpx.AsyncClient, reset_state):
 
 @pytest.mark.asyncio
 async def test_options_item_id(client: httpx.AsyncClient, reset_state):
-
     response = await client.post(
         "/items", json={"id": 1, "name": "Test Item", "description": "A test item"}
     )

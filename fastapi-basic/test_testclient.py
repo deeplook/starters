@@ -5,7 +5,7 @@ This is a test file working with the TestClient.
 import pytest
 from fastapi.testclient import TestClient
 
-from main import Item, app, items, next_id
+from main import Item, app, items
 
 
 @pytest.fixture(autouse=True)

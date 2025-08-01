@@ -20,7 +20,7 @@ test: ## Run the test suite with coverage.
 workflow: ## Run the CI workflow locally using act.
 ifndef GITHUB_ACTIONS
 	@echo "Running the CI workflow locally with act..."
-	@act
+	@act --container-architecture linux/amd64 -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest
 else
 	@echo "Skipping 'act' command in GitHub Actions environment."
 endif

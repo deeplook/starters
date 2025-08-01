@@ -1,0 +1,38 @@
+name: End-to-End Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual triggering
+
+# These permissions are required for the OIDC flow
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # The ARN of the IAM role you created in Step 2
+          role-to-assume: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/GitHubActionsAppRunnerTestRole # <-- TODO: Replace with your Role ARN
+          aws-region: eu-central-1 # Or your desired region
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Run End-to-End Test Script
+        run: ./test_e2e.sh
+        working-directory: ./aws-apprunner/terraform

@@ -76,3 +76,7 @@ show_missing = true
 
 [tool.coverage.xml]
 output = "coverage.xml"
+
+[tool.clibro]
+author = "Dinu Gherman"
+website = "https://dinugherman.com/"
