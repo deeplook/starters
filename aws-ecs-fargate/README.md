@@ -6,7 +6,7 @@
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Shell](https://img.shields.io/badge/Shell-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
 
-This Terraform project provisions a complete, production-ready AWS ECS environment using Fargate. It includes a an ECR repository, a dashboard service, an ECS task definition, a load balancer, and all the necessary networking and IAM components.
+This project provisions a complete, production-ready AWS ECS environment using Fargate. It includes a an ECR repository, a dashboard service, an ECS task definition, a load balancer, and all the necessary networking and IAM components.
 
 The setup is designed to deploy a custom dummy Python application using MonsterUI defined in `dashboard.py` and the `Dockerfile`.
 

@@ -45,4 +45,3 @@ docker_image_tag = "latest"
 # The amount of memory (in MiB) to reserve for the container.
 # Default: 512
 # container_memory = 512
-
