@@ -1,0 +1,11 @@
+# AWS Configuration
+region = "eu-central-1"
+
+# VPC Configuration
+vpc_cidr    = "10.0.0.0/16"
+subnet_cidr = "10.0.1.0/24"
+
+# EC2 Instance Configuration
+instance_type   = "t2.micro"
+ami_id          = "ami-0c7076ccf39a16a0c" # Amazon Linux 2 AMI for eu-central-1
+ec2_volume_size = 36

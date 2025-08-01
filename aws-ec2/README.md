@@ -1,4 +1,9 @@
-# AWS EC2 with Terraform
+# AWS EC2
+
+![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![Shell](https://img.shields.io/badge/Shell-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
 
 A minimal example for managing an AWS EC2 instance with Terraform. This project demonstrates infrastructure-as-code best practices by organizing resources into reusable modules.
 
@@ -12,7 +17,7 @@ The Terraform configuration is located in the `terraform` directory and is struc
 
 ## Configuration
 
-All configuration for this project is managed through Terraform variables.
+All configuration for this project is managed in a single file.
 
 1.  **Prerequisites:** Ensure you have the following tools installed.
     ```bash
@@ -21,11 +26,13 @@ All configuration for this project is managed through Terraform variables.
 
 2.  **AWS Credentials:** Make sure your AWS credentials are configured in `~/.aws/config` and `~/.aws/credentials`.
 
-3.  **Review Variables:** Key variables are defined in `terraform/variables.tf`. You can override the defaults by creating a `terraform.tfvars` file or by passing them on the command line. Common variables to customize include:
-    - `region`: The AWS region for deployment.
-    - `instance_type`: The EC2 instance type (e.g., `t2.micro`).
-    - `ami_id`: The Amazon Machine Image to use.
-    - `ec2_volume_size`: The size of the root EBS volume.
+3.  **Create a configuration file:** Copy the example file to create your own local configuration.
+    ```bash
+    cp terraform/terraform.tfvars.example terraform/terraform.tfvars
+    ```
+    Terraform will automatically load variables from `terraform.tfvars`. This file is ignored by Git, so your local settings will not be checked in.
+
+4.  **Edit `terraform.tfvars`:** Open the `terraform/terraform.tfvars` file and adjust the values to match your requirements (e.g., change the `region`, `instance_type`, or `ami_id`).
 
 ## Getting Started
 
