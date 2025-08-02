@@ -6,10 +6,6 @@
 ![uv](https://img.shields.io/badge/uv-%2300A3B0.svg?style=for-the-badge&logo=uv&logoColor=white)
 ![Shell](https://img.shields.io/badge/Shell-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
 
-Below are the Markdown lines for badges representing FastAPI and uv, using the for-the-badge style consistent with your previous badges. Both FastAPI and uv have logos available in Shields.io via SimpleIcons, so these badges will include their respective logos. I’ve also included the updated full set of badges, incorporating FastAPI and uv alongside the existing ones (Docker, Terraform, Python, AWS, Bash, AWS EC2, AWS S3, Node.js, FastHTML, MonsterUI).
-text
-
-## Technologies Used
 A minimal FastAPI server demonstrating all common HTTP methods with tests.
 
 ![](assets/fastapi-basic-openapi.png)
