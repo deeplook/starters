@@ -14,10 +14,11 @@ all: build ## Build the application
 docker-up: ## Build and start the Docker containers
 	source myapp.env && docker-compose --env-file myapp.env up -d
 
-test-api: ## Run the API tests using the curl script
-	source myapp.env && curl -X GET http://127.0.0.1:${MYAPP_PORT}/items
+test-curl: ## Run the API tests using the curl script
+	source myapp.test.env && curl -X GET http://127.0.0.1:${MYAPP_PORT}/items
 
-test: test-api ## Alias for test-api
+test:  ## Run tests on test database
+	source myapp.test.env && uv run pytest -s -v
 
 docker-down: ## Stop the Docker containers
 	docker-compose stop
