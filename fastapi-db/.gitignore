@@ -18,6 +18,3 @@ myapp.test.env
 .vscode/
 .vs/
 *.code-workspace
-
-# Awk scripts
-help.awk
