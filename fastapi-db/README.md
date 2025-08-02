@@ -6,11 +6,7 @@
 ![uv](https://img.shields.io/badge/uv-%2300A3B0.svg?style=for-the-badge&logo=uv&logoColor=white)
 ![Shell](https://img.shields.io/badge/Shell-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
 
-Below are the Markdown lines for badges representing FastAPI and uv, using the for-the-badge style consistent with your previous badges. Both FastAPI and uv have logos available in Shields.io via SimpleIcons, so these badges will include their respective logos. I’ve also included the updated full set of badges, incorporating FastAPI and uv alongside the existing ones (Docker, Terraform, Python, AWS, Bash, AWS EC2, AWS S3, Node.js, FastHTML, MonsterUI).
-text
-
-## Technologies Used
-A minimal FastAPI server demonstrating all common HTTP methods with tests.
+A minimal FastAPI server with a simple database, demonstrating all common HTTP methods with tests, with decent configuration via environment variables or files.
 
 ![](assets/fastapi-basic-openapi.png)
 
@@ -24,9 +20,9 @@ This project uses `uv` for dependency management.
 uv sync
 ```
 
-2.  **Configure the port:**
+2.  **Configure the config file:**
 
-Copy the example file to `.env` and then edit the desired local port in it.
+Copy the example file to `.env` and then edit to change the port or database URL if needed.
 
 ```bash
 cp myapp.env.example myapp.env
@@ -34,8 +30,11 @@ cp myapp.env.example myapp.env
 
 3.  **Run the server:**
 
+Use any of these commands:
+
 ```bash
-source myapp.env && uv run uvicorn main:app --port $MYAPP_PORT --reload
+source myapp.env && uv run uvicorn main:app --port $MYAPP_PORT
+MYAPP_ENV_PATH=myapp.env uv run main.py
 ```
 
 4.  **Smoke-test the Server:**
@@ -65,19 +64,19 @@ docker compose down
 This will run tests on a real server on a temporary free port.
 
 ```bash
-❯ uv run pytest
-====================== test session starts ======================
+❯ MYAPP_ENV_PATH=myapp.test.env uv run pytest
+============================ test session starts ============================
 platform darwin -- Python 3.12.10, pytest-8.4.1, pluggy-1.6.0
-rootdir: /path/to/fastapi-basic
+rootdir: /path/to/fastapi-db
 configfile: pyproject.toml
 plugins: anyio-3.7.1, asyncio-1.0.0
 asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collected 24 items
+collected 22 items
 
-test_real.py ............                                 [ 50%]
-test_testclient.py ............                           [100%]
+test_real.py ............                                             [ 54%]
+test_testclient.py ..........                                         [100%]
 
-====================== 24 passed in 2.80s =======================
+============================ 22 passed in 2.55s =============================
 ```
 
 ## Next Steps

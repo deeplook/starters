@@ -9,12 +9,11 @@ if [ -n "$MYAPP_ENV_PATH" ]; then
     export $(cat "$MYAPP_ENV_PATH" | grep -v '^#' | xargs)
 fi
 
+echo "Environment variables:"
 echo "MYAPP_ENV_PATH: $MYAPP_ENV_PATH"
 echo "MYAPP_PORT: $MYAPP_PORT"
 echo "MYAPP_DATABASE_URL: $MYAPP_DATABASE_URL"
 echo
-
-exit 0
 
 echo "Get all items"
 curl -X GET http://127.0.0.1:$MYAPP_PORT/items && echo
