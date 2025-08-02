@@ -43,10 +43,11 @@ This is an example `curl` commands to test one API endpoint (you can run more wh
 
 ```bash
 # Get all items
-curl -X GET http://127.0.0.1:8000/items
+❯ source myapp.env && curl -X GET http://127.0.0.1:$MYAPP_PORT/items
+[]
 ```
 
-The server will be available like at `http://127.0.0.1:8000`. You can access the interactive API documentation at `http://127.0.0.1:8000/docs`.
+The server will be available like at `http://127.0.0.1:$MYAPP_PORT`. You can access the interactive API documentation at `http://127.0.0.1:$MYAPP_PORT/docs`.
 
 ## Run inside Docker
 
