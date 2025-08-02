@@ -15,7 +15,7 @@ ENV PATH="/home/appuser/.local/bin:${PATH}"
 COPY --chown=appuser:appuser pyproject.toml .
 
 # Install dependencies.
-RUN pip install --no-cache-dir "fastapi>=0.115.14" "uvicorn>=0.30.3" "python-dotenv>=0.21.0"
+RUN pip install --no-cache-dir "fastapi>=0.115.14" "uvicorn>=0.30.3" "python-dotenv>=0.21.0" "sqlmodel>=0.0.19"
 
 # Copy the rest of the application code to the working directory
 COPY . .
@@ -27,4 +27,4 @@ ENV MYAPP_PORT=8000
 EXPOSE 8000
 
 # Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "main.py"]

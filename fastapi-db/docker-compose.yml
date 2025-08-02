@@ -2,8 +2,8 @@ services:
   api:
     build: .
     env_file:
-      - .env
+      - myapp.env
     ports:
-      - "${MYAPP_PORT}:8000"
+      - "${MYAPP_PORT}:${MYAPP_PORT}"
     volumes:
       - .:/app
