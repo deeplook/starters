@@ -1,0 +1,9 @@
+services:
+  api:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "${MYAPP_PORT}:8000"
+    volumes:
+      - .:/app
