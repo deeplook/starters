@@ -4,10 +4,11 @@
 DEFAULT_GOAL := help
 .DEFAULT_GOAL := $(DEFAULT_GOAL)
 
-help: ## Show this help message
-	@echo "Usage: make [target]"
-	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?##' $(MAKEFILE_LIST) | awk -f help.awk
+help:  ## Display this help screen
+	@echo "Usage: make [target] ..."
+	@echo
+	@echo "Available targets:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 all: build ## Build the application
 
