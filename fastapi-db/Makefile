@@ -13,7 +13,7 @@ help:  ## Display this help screen
 all: build ## Build the application
 
 docker-up: ## Build and start the Docker containers
-	source myapp.env && docker-compose --env-file myapp.env up -d
+	source myapp.env && docker-compose --env-file myapp.env up -d --build
 
 test-curl: ## Run the API tests using the curl script
 	source myapp.test.env && curl -X GET http://127.0.0.1:${MYAPP_PORT}/items

@@ -9,7 +9,7 @@ from typing import List, Optional
 from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-from config import MYAPP_PORT, MYAPP_DATABASE_URL
+from config import settings
 
 
 class ItemBase(SQLModel):
@@ -31,9 +31,7 @@ class ItemUpdate(SQLModel):
 
 
 connect_args = {"check_same_thread": False}
-if not MYAPP_DATABASE_URL:
-    raise ValueError("MYAPP_DATABASE_URL is not set")
-engine = create_engine(MYAPP_DATABASE_URL, echo=True, connect_args=connect_args)
+engine = create_engine(settings.database_url, echo=True, connect_args=connect_args)
 
 
 def create_db_and_tables():
@@ -143,4 +141,4 @@ async def options_item_id(item_id: int) -> dict[str, list[str]]:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=MYAPP_PORT)
+    uvicorn.run(app, host="0.0.0.0", port=settings.port)

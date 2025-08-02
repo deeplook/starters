@@ -10,7 +10,8 @@ environment variables are required, and must be prefixed with `MYAPP_`:
 There are two ways to provide these environment variables, namely by first
 looking in an environment file found in the env. var. `MYAPP_ENV_PATH`
 pointing to a file with values for `MYAPP_PORT` and `MYAPP_DATABASE_URL`,
-and if that fails, then by looking up the variables in your shell environment:
+and if that fails, then by looking up the variables in your shell environment.
+The `.env` file is always prioritized over the shell environment variables.
 
 1.  **Using an environment file:**
     Set the `MYAPP_ENV_PATH` environment variable to the path of a file
@@ -37,40 +38,63 @@ and if that fails, then by looking up the variables in your shell environment:
 """
 
 import os
+from typing import Tuple
 
-from dotenv import dotenv_values
+from pydantic import ValidationError
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 
 
-# Load environment variables from a file or from the environment.
-MYAPP_ENV_PATH = os.getenv("MYAPP_ENV_PATH", "")
-if MYAPP_ENV_PATH:
-    # MYAPP_ENV_PATH=myapp.env uv run main.py
-    # MYAPP_ENV_PATH=myapp.test.env uv run main.py
-    if not os.path.exists(MYAPP_ENV_PATH):
-        msg = (
-            f"Error: File specified by MYAPP_ENV_PATH does not exist: {MYAPP_ENV_PATH}"
+class Settings(BaseSettings):
+    """Pydantic settings class to manage configuration."""
+
+    port: int
+    database_url: str
+
+    model_config = SettingsConfigDict(
+        env_prefix="MYAPP_",
+        env_file=os.getenv("MYAPP_ENV_PATH"),
+        env_file_encoding="utf-8",
+    )
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: "Settings",
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        return (
+            init_settings,
+            dotenv_settings,
+            env_settings,
+            file_secret_settings,
         )
-        raise FileNotFoundError(msg)
-    env = dotenv_values(MYAPP_ENV_PATH)
-    env["MYAPP_ENV_PATH"] = MYAPP_ENV_PATH
-else:
-    # source myapp.env && uv run main.py
-    # source myapp.test.env && uv run main.py
-    env = {
-        key: value
-        for key, value in os.environ.items()
-        if key.startswith("MYAPP_") and value != ""
-    }
-print(f"env: {env}")
-if len(env) == 0:
-    msg = "Error: No environment variables found with prefix MYAPP_"
-    raise ValueError(msg)
 
-MYAPP_PORT_STR = env.get("MYAPP_PORT")
-if not MYAPP_PORT_STR:
-    raise ValueError("Error: MYAPP_PORT environment variable not set.")
-MYAPP_PORT = int(MYAPP_PORT_STR)
 
-MYAPP_DATABASE_URL = env.get("MYAPP_DATABASE_URL")
-if not MYAPP_DATABASE_URL:
-    raise ValueError("Error: MYAPP_DATABASE_URL environment variable not set.")
+env_path = os.getenv("MYAPP_ENV_PATH")
+
+# If MYAPP_ENV_PATH is set, we require the file to exist.
+if env_path and not os.path.exists(env_path):
+    raise FileNotFoundError(
+        f"The specified environment file does not exist: {env_path}"
+    )
+
+try:
+    settings = Settings()
+except ValidationError as e:
+    # Catch Pydantic's validation error and raise a more user-friendly
+    # exception that lists all required environment variables.
+    required_vars = ["MYAPP_PORT", "MYAPP_DATABASE_URL"]
+    error_message = (
+        "Configuration error: Missing or invalid required settings.\n"
+        "Please provide the following environment variables, either in a file "
+        "pointed to by MYAPP_ENV_PATH or as shell environment variables:"
+    )
+    error_message += "\n- " + "\n- ".join(required_vars)
+    raise ValueError(error_message) from e

@@ -1,21 +1,25 @@
+import os
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlalchemy.pool import StaticPool
 
-from config import MYAPP_DATABASE_URL
-from main import app, get_session
-
-
-if not MYAPP_DATABASE_URL:
-    raise ValueError("MYAPP_DATABASE_URL is not set")
+# Check for the existence of the environment file before running tests.
+# This ensures that pytest fails immediately if the file is missing.
+env_path = os.getenv("MYAPP_ENV_PATH")
+if env_path and not os.path.exists(env_path):
+    raise FileNotFoundError(
+        f"The specified environment file does not exist: {env_path}"
+    )
 
 
 @pytest.fixture(name="engine")
 def engine_fixture():
     """Create a new engine for each test function."""
+    from config import settings
+
     engine = create_engine(
-        MYAPP_DATABASE_URL,
+        settings.database_url,
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
@@ -34,6 +38,7 @@ def session_fixture(engine):
 @pytest.fixture(name="client")
 def client_fixture(session: Session):
     """Create a new client for each test function."""
+    from main import app, get_session
 
     def get_session_override():
         return session
