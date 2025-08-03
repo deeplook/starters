@@ -1,12 +1,18 @@
-name: End-to-End Test
+name: App Runner End-to-End Test
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'aws-apprunner/**'
+      - '.github/workflows/apprunner-e2e-ci.yml'
   pull_request:
     branches:
       - main
+    paths:
+      - 'aws-apprunner/**'
+      - '.github/workflows/apprunner-e2e-ci.yml'
   workflow_dispatch: # Allows manual triggering
 
 # These permissions are required for the OIDC flow
@@ -24,9 +30,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          # The ARN of the IAM role you created in Step 2
-          role-to-assume: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/GitHubActionsAppRunnerTestRole # <-- TODO: Replace with your Role ARN
-          aws-region: eu-central-1 # Or your desired region
+          role-to-assume: arn:aws:iam::629215267253:role/GitHubActionsRole # Role ARN from the aws-github-oidc terraform output
+          aws-region: eu-central-1
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
