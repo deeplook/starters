@@ -33,6 +33,11 @@ resource "aws_apprunner_auto_scaling_configuration_version" "app_autoscale" {
   max_size                        = var.app_max_size
 }
 
+locals {
+  # Determine if the provided image is from a public ECR repository.
+  is_public_image = strcontains(var.app_image_identifier, "public.ecr.aws")
+}
+
 # Provisions the App Runner service to run the containerized application.
 resource "aws_apprunner_service" "app_service" {
   service_name = var.app_service_name
@@ -40,17 +45,19 @@ resource "aws_apprunner_service" "app_service" {
 
   source_configuration {
     image_repository {
-      image_identifier      = var.app_image_identifier != null ? var.app_image_identifier : "public.ecr.aws/aws-containers/hello-app-runner:latest"
-      image_repository_type = var.app_image_identifier != null ? "ECR" : "ECR_PUBLIC"
+      image_identifier      = var.app_image_identifier
+      image_repository_type = local.is_public_image ? "ECR_PUBLIC" : "ECR"
       image_configuration {
         port                            = var.app_port
         runtime_environment_variables = var.app_environment_variables
       }
     }
     authentication_configuration {
-      access_role_arn = var.app_image_identifier != null ? aws_iam_role.apprunner_role.arn : null
+      # Only provide an access role for private ECR images.
+      access_role_arn = local.is_public_image ? null : aws_iam_role.apprunner_role.arn
     }
-    auto_deployments_enabled = var.app_image_identifier != null ? true : false
+    # Auto-deployments only make sense for private ECR images that we control.
+    auto_deployments_enabled = local.is_public_image ? false : true
   }
 
   instance_configuration {
