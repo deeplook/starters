@@ -28,21 +28,27 @@ jobs:
 
       - name: Run End-to-End Test
         run: |
-          # Step 1: Build and push the Docker image
+          # Step 1: Create a temporary tfvars file for the E2E run
+          echo "--- 📝 Creating terraform.tfvars for E2E ---"
+          cp terraform.tfvars.example terraform.tfvars
+          echo 'environment = "e2e-test"' >> terraform.tfvars
+          echo 'create_apprunner_service = true' >> terraform.tfvars
+
+          # Step 2: Build and push the Docker image
           echo "--- 📦 Building and Pushing Docker Image ---"
           ./push_image.sh
 
-          # Step 2: Provision the temporary infrastructure
+          # Step 3: Provision the temporary infrastructure
           echo "--- 🚀 Provisioning Temporary E2E Environment ---"
           terraform init
-          terraform apply -auto-approve -var-file="e2e.tfvars"
+          terraform apply -auto-approve
 
-          # Step 3: Run smoke tests against the new service
+          # Step 4: Run smoke tests against the new service
           echo "--- 🔬 Running Smoke Tests ---"
           SERVICE_URL=$(terraform output -raw app_service_url)
           ./run_smoke_tests.sh $SERVICE_URL
 
-          # Step 4: Clean up the temporary environment
+          # Step 5: Clean up the temporary environment
           echo "--- 🧹 Destroying Temporary E2E Environment ---"
-          terraform destroy -auto-approve -var-file="e2e.tfvars"
+          terraform destroy -auto-approve
         working-directory: ./aws-apprunner/terraform
