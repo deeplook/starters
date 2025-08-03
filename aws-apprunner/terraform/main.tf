@@ -33,7 +33,7 @@ module "apprunner" {
   app_image_identifier      = var.app_image_identifier_override != null ? var.app_image_identifier_override : "${module.ecr.repository_url}:${var.image_tag}"
   app_environment_variables = var.app_environment_variables
   app_service_name          = "${var.app_service_name}-${var.environment}"
-  app_autoscale_config_name = var.app_autoscale_config_name
+  app_autoscale_config_name = "${var.app_autoscale_config_name}-${var.environment}"
   app_max_concurrency       = var.app_max_concurrency
   app_min_size              = var.app_min_size
   app_max_size              = var.app_max_size
