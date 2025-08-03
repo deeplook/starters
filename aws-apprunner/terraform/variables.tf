@@ -104,3 +104,9 @@ variable "environment" {
   type        = string
   default     = "prod" # Your main service will be 'prod' by default
 }
+
+variable "app_image_identifier_override" {
+  description = "If set, overrides the ECR image identifier for the App Runner service. Used for initial creation with a placeholder."
+  type        = string
+  default     = null
+}

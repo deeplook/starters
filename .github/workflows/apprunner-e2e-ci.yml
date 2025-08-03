@@ -34,20 +34,20 @@ jobs:
           echo 'environment = "e2e-test"' >> terraform.tfvars
           echo 'create_apprunner_service = true' >> terraform.tfvars
 
-          # Step 2: Provision the infrastructure, including the ECR repository
-          echo "--- 🚀 Provisioning E2E Infrastructure (First Pass) ---"
+          # Step 2: Provision infrastructure with a placeholder image
+          echo "--- 🚀 Provisioning E2E Infrastructure (with placeholder) ---"
           terraform init
-          terraform apply -auto-approve
+          terraform apply -auto-approve -var="app_image_identifier_override=public.ecr.aws/aws-containers/hello-app-runner:latest"
 
-          # Step 3: Build and push the Docker image to the new repository
+          # Step 3: Build and push the actual application image
           echo "--- 📦 Building and Pushing Docker Image ---"
           ./push_image.sh
 
-          # Step 4: Apply again to update App Runner with the new image
-          echo "--- 🚀 Updating App Runner with New Image (Second Pass) ---"
+          # Step 4: Update App Runner to use the new image
+          echo "--- 🚀 Updating App Runner with New Image ---"
           terraform apply -auto-approve
 
-          # Step 5: Run smoke tests against the new service
+          # Step 5: Run smoke tests against the live service
           echo "--- 🔬 Running Smoke Tests ---"
           SERVICE_URL=$(terraform output -raw app_service_url)
           ./run_smoke_tests.sh $SERVICE_URL
