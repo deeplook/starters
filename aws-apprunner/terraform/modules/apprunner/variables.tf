@@ -122,9 +122,3 @@ variable "app_tags" {
     Name = "NodeAppService"
   }
 }
-
-variable "environment" {
-  description = "The environment name (e.g., 'prod', 'e2e-test')."
-  type        = string
-  default     = "prod"
-}

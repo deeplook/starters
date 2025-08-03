@@ -1,5 +1,4 @@
-# .github/workflows/cleanup-e2e.yml
-name: Cleanup E2E Environment on Failure
+name: App Runner End-to-End Test Cleanup
 
 # This workflow is triggered automatically when another workflow run completes.
 on:
@@ -9,15 +8,13 @@ on:
     types:
       - completed
 
-# Only run this job if the triggering workflow failed.
-if: github.event.workflow_run.conclusion == 'failure'
-
 permissions:
   id-token: write   # Required for OIDC authentication
   contents: read    # Required to check out the repository
 
 jobs:
   cleanup:
+    if: github.event.workflow_run.conclusion == 'failure'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

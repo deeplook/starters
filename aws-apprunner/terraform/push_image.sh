@@ -32,9 +32,13 @@ get_tf_var() {
 # --- Read variables from terraform.tfvars ---
 echo "Reading configuration from $TF_VARS_FILE..."
 AWS_REGION=$(get_tf_var "aws_region")
-ECR_REPO_NAME=$(get_tf_var "ecr_repository_name")
+ECR_REPO_BASE_NAME=$(get_tf_var "ecr_repository_name")
+ENVIRONMENT=$(get_tf_var "environment")
 DOCKER_PLATFORM=$(get_tf_var "docker_build_platform")
 IMAGE_TAG=$(get_tf_var "image_tag")
+
+# --- Construct the full environment-specific repository name ---
+ECR_REPO_NAME="${ECR_REPO_BASE_NAME}-${ENVIRONMENT}"
 
 # --- Get AWS Account ID ---
 echo "Fetching AWS Account ID..."
@@ -70,11 +74,3 @@ docker push "$ECR_IMAGE_URI"
 
 echo ""
 echo "✅ Successfully pushed image to ECR: $ECR_IMAGE_URI"
-
-# --- Create and deploy App Runner service ---
-echo "Creating App Runner service..."
-terraform apply --auto-approve -var="create_apprunner_service=true"
-
-echo ""
-echo "🚀 Deployment started for App Runner service (this may take a few minutes)."
-echo "Service URL: https://$(terraform output -raw app_service_url)"
