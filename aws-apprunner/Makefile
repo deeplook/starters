@@ -12,3 +12,10 @@ clean:
 test-e2e:
 	@echo "Running end-to-end tests..."
 	@./terraform/test_e2e.sh
+
+.PHONY: destroy
+destroy:
+	@echo "Destroying App Runner PROD infrastructure..."
+	# This destroys the default 'prod' environment.
+	# The ephemeral 'e2e-test' environment is destroyed automatically by the GitHub workflow.
+	cd terraform && terraform destroy -auto-approve

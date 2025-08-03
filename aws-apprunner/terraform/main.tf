@@ -9,11 +9,19 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
+
+  default_tags {
+    tags = {
+      Project     = "AppRunner-E2E"
+      ManagedBy   = "Terraform"
+      Environment = "Test"
+    }
+  }
 }
 
 module "ecr" {
   source              = "./modules/ecr"
-  ecr_repository_name = var.ecr_repository_name
+  ecr_repository_name = "${var.ecr_repository_name}-${var.environment}"
 }
 
 module "apprunner" {
@@ -23,7 +31,7 @@ module "apprunner" {
   aws_region                = var.aws_region
   app_image_identifier      = "${module.ecr.repository_url}:${var.image_tag}"
   app_environment_variables = var.app_environment_variables
-  app_service_name          = var.app_service_name
+  app_service_name          = "${var.app_service_name}-${var.environment}"
   app_autoscale_config_name = var.app_autoscale_config_name
   app_max_concurrency       = var.app_max_concurrency
   app_min_size              = var.app_min_size

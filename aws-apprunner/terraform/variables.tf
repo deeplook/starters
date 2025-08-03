@@ -98,3 +98,9 @@ variable "create_apprunner_service" {
   type        = bool
   default     = false
 }
+
+variable "environment" {
+  description = "The environment name to append to resource names (e.g., 'prod', 'staging', 'e2e-test')."
+  type        = string
+  default     = "prod" # Your main service will be 'prod' by default
+}
