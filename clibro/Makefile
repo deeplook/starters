@@ -1,7 +1,14 @@
 .PHONY: help
-help: ## Show this help message
-	@echo "Available commands:"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $1, $2}'
+
+# Default to 'help' when no target is given
+DEFAULT_GOAL := help
+.DEFAULT_GOAL := $(DEFAULT_GOAL)
+
+help:  ## Display this help screen
+	@echo "Usage: make [target] ..."
+	@echo
+	@echo "Available targets:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: install
 install: ## Install dependencies and pre-commit hooks.
