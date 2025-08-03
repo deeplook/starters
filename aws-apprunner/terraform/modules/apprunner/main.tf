@@ -66,17 +66,14 @@ resource "aws_apprunner_service" "app_service" {
   }
 
   health_check_configuration {
-    protocol        = "HTTP"
-    path            = var.app_health_check_path
-    interval        = var.app_health_check_interval
-    timeout         = var.app_health_check_timeout
+    protocol = "HTTP"
+    # The public placeholder image responds at '/', not the custom health check path.
+    path     = local.is_public_image ? "/" : var.app_health_check_path
+    interval = var.app_health_check_interval
+    timeout  = var.app_health_check_timeout
     healthy_threshold   = var.app_healthy_threshold
     unhealthy_threshold = var.app_unhealthy_threshold
   }
 
   tags = var.app_tags
-
-  depends_on = [
-    aws_iam_role_policy_attachment.apprunner_policy_attachment
-  ]
 }
