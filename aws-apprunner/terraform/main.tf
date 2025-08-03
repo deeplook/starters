@@ -28,6 +28,7 @@ module "apprunner" {
   count = var.create_apprunner_service ? 1 : 0
 
   source                    = "./modules/apprunner"
+  environment               = var.environment
   aws_region                = var.aws_region
   app_image_identifier      = var.app_image_identifier_override != null ? var.app_image_identifier_override : "${module.ecr.repository_url}:${var.image_tag}"
   app_environment_variables = var.app_environment_variables

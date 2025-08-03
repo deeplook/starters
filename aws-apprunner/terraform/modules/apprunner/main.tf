@@ -4,7 +4,7 @@
 
 # Creates an IAM role that the App Runner service will assume to get permissions.
 resource "aws_iam_role" "apprunner_role" {
-  name = "AppRunnerECRAccessRole"
+  name = "AppRunnerECRAccessRole-${var.environment}"
   assume_role_policy = jsonencode({
     Version   = "2012-10-17",
     Statement = [
