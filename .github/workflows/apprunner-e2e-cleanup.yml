@@ -18,8 +18,10 @@ jobs:
     if: github.event.workflow_run.conclusion == 'failure'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout specific commit that failed
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -36,6 +38,7 @@ jobs:
       - name: Run Terraform Destroy
         run: |
           echo "--- 🧹 Triggering cleanup for failed E2E run ---"
+          rm -rf .terraform
           terraform init
           # Use the e2e.tfvars file to ensure we destroy the correct environment
           terraform destroy -auto-approve -var-file="e2e.tfvars"

@@ -36,6 +36,7 @@ jobs:
 
           # Step 2: Provision infrastructure with a placeholder image
           echo "--- 🚀 Provisioning E2E Infrastructure (with placeholder) ---"
+          rm -rf .terraform
           terraform init
           terraform apply -auto-approve -var="app_image_identifier_override=public.ecr.aws/aws-containers/hello-app-runner:latest"
 
