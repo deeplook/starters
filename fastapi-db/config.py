@@ -63,7 +63,7 @@ class Settings(BaseSettings):
     @classmethod
     def settings_customise_sources(
         cls,
-        settings_cls: "Settings",
+        settings_cls: type[BaseSettings],
         init_settings: PydanticBaseSettingsSource,
         env_settings: PydanticBaseSettingsSource,
         dotenv_settings: PydanticBaseSettingsSource,
@@ -86,7 +86,7 @@ if env_path and not os.path.exists(env_path):
     )
 
 try:
-    settings = Settings()
+    settings = Settings()  # type: ignore[call-arg]
 except ValidationError as e:
     # Catch Pydantic's validation error and raise a more user-friendly
     # exception that lists all required environment variables.
