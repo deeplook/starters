@@ -10,6 +10,38 @@ A minimal FastAPI server with a simple database, demonstrating all common HTTP m
 
 ![](assets/fastapi-basic-openapi.png)
 
+## Project Structure
+
+The project is organized as follows:
+
+```
+.
+├── src
+│   ├── __init__.py
+│   ├── config.py
+│   ├── crud.py
+│   ├── database.py
+│   ├── main.py
+│   ├── models.py
+│   └── schemas.py
+├── tests
+│   ├── __init__.py
+│   ├── test_config.py
+│   ├── test_real.py
+│   └── test_testclient.py
+├── .dockerignore
+├── .gitignore
+├── .python-version
+├── docker-compose.yml
+├── Dockerfile
+├── Makefile
+├── myapp.env.example
+├── myapp.test.env.example
+├── NOTES.txt
+├── pyproject.toml
+└── README.md
+```
+
 ## Setup and Usage
 
 This project uses `uv` for dependency management.
@@ -34,7 +66,7 @@ Use any of these commands:
 
 ```bash
 source myapp.env && uv run uvicorn main:app --port $MYAPP_PORT
-MYAPP_ENV_PATH=myapp.env uv run main.py
+MYAPP_ENV_PATH=myapp.env uv run main
 ```
 
 4.  **Smoke-test the Server:**
@@ -72,12 +104,13 @@ rootdir: /path/to/fastapi-db
 configfile: pyproject.toml
 plugins: anyio-3.7.1, asyncio-1.0.0
 asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collected 22 items
+collected 26 items
 
-test_real.py ............                                             [ 54%]
-test_testclient.py ..........                                         [100%]
+test_config.py ....                                                      [ 15%]
+test_real.py ............                                                [ 61%]
+test_testclient.py ..........                                            [100%]
 
-============================ 22 passed in 2.55s =============================
+============================== 26 passed in 2.83s ==============================
 ```
 
 ## Next Steps

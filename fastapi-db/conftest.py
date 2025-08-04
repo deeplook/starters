@@ -16,7 +16,7 @@ if env_path and not os.path.exists(env_path):
 @pytest.fixture(name="engine")
 def engine_fixture():
     """Create a new engine for each test function."""
-    from config import settings
+    from src.config import settings
 
     engine = create_engine(
         settings.database_url,
@@ -38,7 +38,8 @@ def session_fixture(engine):
 @pytest.fixture(name="client")
 def client_fixture(session: Session):
     """Create a new client for each test function."""
-    from main import app, get_session
+    from main import app
+    from src.database import get_session
 
     def get_session_override():
         return session

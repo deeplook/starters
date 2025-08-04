@@ -10,7 +10,10 @@ import sys
 def run_config_test(env):
     """Helper function to run config.py with a given environment."""
     # The command to run, which will import the config module
-    command = [sys.executable, "-c", "import config"]
+    command = [sys.executable, "-c", "import src.config"]
+
+    # Add the project root to the python path
+    env["PYTHONPATH"] = os.getcwd()
 
     # Run the command with the specified environment
     result = subprocess.run(

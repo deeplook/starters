@@ -4,38 +4,13 @@ using a SQLite database for storage.
 """
 
 from contextlib import asynccontextmanager
-from typing import List, Optional
+from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Session
 
-from config import settings
-
-
-class ItemBase(SQLModel):
-    name: str
-    description: Optional[str] = None
-
-
-class Item(ItemBase, table=True):  # type: ignore
-    id: Optional[int] = Field(default=None, primary_key=True)
-
-
-class ItemCreate(ItemBase):
-    pass
-
-
-class ItemUpdate(SQLModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-
-
-connect_args = {"check_same_thread": False}
-engine = create_engine(settings.database_url, echo=True, connect_args=connect_args)
-
-
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+from src import crud, models, schemas
+from src.database import create_db_and_tables, get_session
 
 
 @asynccontextmanager
@@ -49,77 +24,54 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-def get_session():
-    with Session(engine) as session:
-        yield session
-
-
-@app.get("/items", response_model=List[Item])
+@app.get("/items", response_model=List[models.Item])
 def read_items(session: Session = Depends(get_session)):
     """Retrieve all items."""
-    items = session.exec(select(Item)).all()
-    return items
+    return crud.get_items(session=session)
 
 
-@app.get("/items/{item_id}", response_model=Item)
+@app.get("/items/{item_id}", response_model=models.Item)
 def read_item(item_id: int, session: Session = Depends(get_session)):
     """Retrieve a single item by its ID."""
-    item = session.get(Item, item_id)
-    if not item:
+    db_item = crud.get_item(session=session, item_id=item_id)
+    if db_item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    return item
-
-
-@app.post("/items", response_model=Item, status_code=201)
-def create_item(item: ItemCreate, session: Session = Depends(get_session)):
-    """Create a new item."""
-    db_item = Item.model_validate(item)
-    session.add(db_item)
-    session.commit()
-    session.refresh(db_item)
     return db_item
 
 
-@app.put("/items/{item_id}", response_model=Item)
+@app.post("/items", response_model=models.Item, status_code=201)
+def create_item(item: schemas.ItemCreate, session: Session = Depends(get_session)):
+    """Create a new item."""
+    return crud.create_item(session=session, item=item)
+
+
+@app.put("/items/{item_id}", response_model=models.Item)
 def update_item(
-    item_id: int, item: ItemCreate, session: Session = Depends(get_session)
+    item_id: int, item: schemas.ItemCreate, session: Session = Depends(get_session)
 ):
     """Update an existing item."""
-    db_item = session.get(Item, item_id)
-    if not db_item:
+    db_item = crud.update_item(session=session, item_id=item_id, item=item)
+    if db_item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    item_data = item.model_dump(exclude_unset=True)
-    for key, value in item_data.items():
-        setattr(db_item, key, value)
-    session.add(db_item)
-    session.commit()
-    session.refresh(db_item)
     return db_item
 
 
-@app.patch("/items/{item_id}", response_model=Item)
-def patch_item(item_id: int, item: ItemUpdate, session: Session = Depends(get_session)):
+@app.patch("/items/{item_id}", response_model=models.Item)
+def patch_item(
+    item_id: int, item: schemas.ItemUpdate, session: Session = Depends(get_session)
+):
     """Partially update an existing item."""
-    db_item = session.get(Item, item_id)
-    if not db_item:
+    db_item = crud.patch_item(session=session, item_id=item_id, item=item)
+    if db_item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    item_data = item.model_dump(exclude_unset=True)
-    for key, value in item_data.items():
-        setattr(db_item, key, value)
-    session.add(db_item)
-    session.commit()
-    session.refresh(db_item)
     return db_item
 
 
 @app.delete("/items/{item_id}", status_code=204)
 def delete_item(item_id: int, session: Session = Depends(get_session)):
     """Delete an item."""
-    item = session.get(Item, item_id)
-    if not item:
+    if not crud.delete_item(session=session, item_id=item_id):
         raise HTTPException(status_code=404, detail="Item not found")
-    session.delete(item)
-    session.commit()
     return
 
 
@@ -140,5 +92,6 @@ async def options_item_id(item_id: int) -> dict[str, list[str]]:
 
 if __name__ == "__main__":
     import uvicorn
+    from src.config import settings
 
     uvicorn.run(app, host="0.0.0.0", port=settings.port)
