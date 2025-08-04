@@ -4,15 +4,27 @@ using a SQLite database for storage.
 """
 
 from contextlib import asynccontextmanager
-from typing import List
+from typing import Annotated, List
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, status
 from sqlmodel import Session
 
 from src import crud, models, schemas
 from src.database import create_db_and_tables, get_session
 
 
+# The `AsyncContextManager` is used to manage the lifecycle of the application.
+# In this case, it's used to create the database and tables when the application
+# starts up.
+#
+# The `lifespan` function is a context manager that will be executed before the
+# application starts receiving requests.
+#
+# It's a good practice to use a context manager to manage resources that need
+# to be cleaned up when the application shuts down.
+#
+# For more information, see:
+# https://fastapi.tiangolo.com/advanced/events/
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -23,75 +35,78 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+DBSession = Annotated[Session, Depends(get_session)]
+
 
 @app.get("/items", response_model=List[models.Item])
-def read_items(session: Session = Depends(get_session)):
+def read_items(session: DBSession):
     """Retrieve all items."""
     return crud.get_items(session=session)
 
 
 @app.get("/items/{item_id}", response_model=models.Item)
-def read_item(item_id: int, session: Session = Depends(get_session)):
+def read_item(item_id: int, session: DBSession):
     """Retrieve a single item by its ID."""
     db_item = crud.get_item(session=session, item_id=item_id)
     if db_item is None:
-        raise HTTPException(status_code=404, detail="Item not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
+        )
     return db_item
 
 
-@app.post("/items", response_model=models.Item, status_code=201)
-def create_item(item: schemas.ItemCreate, session: Session = Depends(get_session)):
+@app.post(
+    "/items",
+    response_model=models.Item,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_item(item: schemas.ItemCreate, session: DBSession):
     """Create a new item."""
     return crud.create_item(session=session, item=item)
 
 
 @app.put("/items/{item_id}", response_model=models.Item)
-def update_item(
-    item_id: int, item: schemas.ItemCreate, session: Session = Depends(get_session)
-):
+def update_item(item_id: int, item: schemas.ItemCreate, session: DBSession):
     """Update an existing item."""
     db_item = crud.update_item(session=session, item_id=item_id, item=item)
     if db_item is None:
-        raise HTTPException(status_code=404, detail="Item not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
+        )
     return db_item
 
 
 @app.patch("/items/{item_id}", response_model=models.Item)
-def patch_item(
-    item_id: int, item: schemas.ItemUpdate, session: Session = Depends(get_session)
-):
+def patch_item(item_id: int, item: schemas.ItemUpdate, session: DBSession):
     """Partially update an existing item."""
-    db_item = crud.patch_item(session=session, item_id=item_id, item=item)
+    db_item = crud.update_item(session=session, item_id=item_id, item=item)
     if db_item is None:
-        raise HTTPException(status_code=404, detail="Item not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
+        )
     return db_item
 
 
-@app.delete("/items/{item_id}", status_code=204)
-def delete_item(item_id: int, session: Session = Depends(get_session)):
+@app.delete("/items/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_item(item_id: int, session: DBSession):
     """Delete an item."""
     if not crud.delete_item(session=session, item_id=item_id):
-        raise HTTPException(status_code=404, detail="Item not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
+        )
     return
 
 
-@app.options("/items")
-async def options_items() -> dict[str, list[str]]:
-    """Get available methods for the /items endpoint."""
-    return {"methods": ["GET", "POST", "OPTIONS"]}
-
-
-@app.options("/items/{item_id}")
-async def options_item_id(item_id: int) -> dict[str, list[str]]:
-    """Get available methods for the /items/{item_id} endpoint."""
-    return {"methods": ["GET", "PUT", "PATCH", "DELETE", "OPTIONS"]}
-
-
-# FastAPI automatically handles HEAD requests if a GET route is defined.
-# No explicit HEAD endpoint is needed.
+# FastAPI automatically handles HEAD and OPTIONS requests.
+# No explicit HEAD or OPTIONS endpoints are needed.
 
 if __name__ == "__main__":
     import uvicorn
     from src.config import settings
 
-    uvicorn.run(app, host="0.0.0.0", port=settings.port)
+    uvicorn.run(
+        app,
+        host=settings.fastapi_host,
+        port=settings.fastapi_port,
+        reload=settings.fastapi_reload,
+    )

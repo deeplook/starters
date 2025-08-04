@@ -19,7 +19,10 @@ def create_item(session: Session, item: schemas.ItemCreate):
     return db_item
 
 
-def update_item(session: Session, item_id: int, item: schemas.ItemCreate):
+def update_item(
+    session: Session, item_id: int, item: schemas.ItemUpdate | schemas.ItemCreate
+):
+    """Update an item."""
     db_item = session.get(models.Item, item_id)
     if not db_item:
         return None
@@ -32,13 +35,18 @@ def update_item(session: Session, item_id: int, item: schemas.ItemCreate):
     return db_item
 
 
-def patch_item(session: Session, item_id: int, item: schemas.ItemUpdate):
-    db_item = session.get(models.Item, item_id)
-    if not db_item:
-        return None
-    item_data = item.model_dump(exclude_unset=True)
-    for key, value in item_data.items():
-        setattr(db_item, key, value)
+def upsert_item(session: Session, item: schemas.ItemCreate):
+    """
+    Update an item if it exists, otherwise create it.
+    This function is not used in the API, but is useful for testing.
+    """
+    db_item = session.get(models.Item, item.id)
+    if db_item:
+        item_data = item.model_dump(exclude_unset=True)
+        for key, value in item_data.items():
+            setattr(db_item, key, value)
+    else:
+        db_item = models.Item.model_validate(item)
     session.add(db_item)
     session.commit()
     session.refresh(db_item)

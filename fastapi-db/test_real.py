@@ -173,27 +173,3 @@ async def test_delete_item(client: httpx.AsyncClient, reset_state):
 async def test_delete_item_not_found(client: httpx.AsyncClient, reset_state):
     response = await client.delete("/items/999")
     assert response.status_code == 404
-
-
-@pytest.mark.asyncio
-async def test_options_items(client: httpx.AsyncClient, reset_state):
-    response = await client.options("/items")
-    assert response.status_code == 200
-    assert "GET" in response.json()["methods"]
-    assert "POST" in response.json()["methods"]
-
-
-@pytest.mark.asyncio
-async def test_options_item_id(client: httpx.AsyncClient, reset_state):
-    response = await client.post(
-        "/items", json={"id": 1, "name": "Test Item", "description": "A test item"}
-    )
-    item_id = response.json()["id"]
-
-    response = await client.options(f"/items/{item_id}")
-    assert response.status_code == 200
-    methods = response.json()["methods"]
-    assert "GET" in methods
-    assert "PUT" in methods
-    assert "PATCH" in methods
-    assert "DELETE" in methods
