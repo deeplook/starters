@@ -53,6 +53,8 @@ class Settings(BaseSettings):
 
     port: int
     database_url: str
+    host: str = "0.0.0.0"
+    reload: bool = False
 
     model_config = SettingsConfigDict(
         env_prefix="MYAPP_",

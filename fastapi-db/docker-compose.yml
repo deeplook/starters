@@ -1,9 +1,10 @@
 services:
   api:
     build: .
-    env_file:
-      - myapp.env
+    environment:
+      - MYAPP_PORT=${MYAPP_PORT}
+      - MYAPP_DATABASE_URL=${MYAPP_DATABASE_URL}
     ports:
-      - "${MYAPP_PORT}:${MYAPP_PORT}"
+      - "${MYAPP_PORT}:8000"
     volumes:
       - .:/app

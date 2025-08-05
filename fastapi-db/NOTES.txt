@@ -19,3 +19,22 @@ docker compose up -d
 source .env && curl -X GET http://127.0.0.1:$MYAPP_PORT/items
 docker compose down
 ```
+
+
+E2E
+
+```bash
+export MYAPP_ENV_PATH=myapp.env
+make docker-up
+sleep 5
+make test-curl
+make test
+make docker-down
+
+export MYAPP_ENV_PATH=myapp.env
+make start-local &
+sleep 5
+make test-curl
+make test
+make stop-local
+```

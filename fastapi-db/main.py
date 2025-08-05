@@ -3,6 +3,7 @@ This is a minimal FastAPI server that implements all HTTP methods,
 using a SQLite database for storage.
 """
 
+import os
 from contextlib import asynccontextmanager
 from typing import Annotated, List
 
@@ -10,6 +11,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from sqlmodel import Session
 
 from src import crud, models, schemas
+from src.config import settings
 from src.database import create_db_and_tables, get_session
 
 
@@ -28,6 +30,11 @@ from src.database import create_db_and_tables, get_session
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
+    # Create the directory if it doesn't exist
+    db_path = settings.database_url.replace("sqlite:///", "")
+    db_dir = os.path.dirname(db_path)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
     create_db_and_tables()
     yield
     # Shutdown
@@ -97,16 +104,7 @@ def delete_item(item_id: int, session: DBSession):
     return
 
 
-# FastAPI automatically handles HEAD and OPTIONS requests.
-# No explicit HEAD or OPTIONS endpoints are needed.
-
 if __name__ == "__main__":
-    import uvicorn
-    from src.config import settings
+    from src.cli import cli
 
-    uvicorn.run(
-        app,
-        host=settings.fastapi_host,
-        port=settings.fastapi_port,
-        reload=settings.fastapi_reload,
-    )
+    cli()

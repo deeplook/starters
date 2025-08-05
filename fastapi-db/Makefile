@@ -26,14 +26,28 @@ clean: ## Remove temporary build files.
 
 all: build ## Build the application
 
-docker-up: ## Build and start the Docker containers
-	source myapp.env && docker-compose --env-file myapp.env up -d --build
+docker-up: ## Build and start the Docker container. Requires MYAPP_ENV_PATH to be set.
+	@if [ -z "$(MYAPP_ENV_PATH)" ]; then \
+		echo "Error: MYAPP_ENV_PATH is not set. Please set it to the path of your environment file."; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(MYAPP_ENV_PATH)" ]; then \
+		echo "Error: Environment file not found at $(MYAPP_ENV_PATH)"; \
+		exit 1; \
+	fi
+	docker-compose --env-file $(MYAPP_ENV_PATH) up -d --build
 
 test-curl: ## Run the API tests using the curl script
-	source myapp.test.env && curl -X GET http://127.0.0.1:${MYAPP_PORT}/items
+	bash tests/test_curl.sh
 
-test:  ## Run tests on test database
-	source myapp.test.env && uv run pytest -s -v
+test:  ## Run tests on database
+	uv run pytest -s -v
 
 docker-down: ## Stop the Docker containers
-	docker-compose stop
+	docker-compose down
+
+start-local: ## Start the application locally
+	uv run main.py start
+
+stop-local: ## Stop the application locally
+	uv run main.py stop
