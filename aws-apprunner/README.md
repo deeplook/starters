@@ -8,10 +8,6 @@
 
 This project shows how to build a Node.js app into a Docker image, push it to Amazon ECR, and deploy it on AWS App Runner using Terraform and simple shell scripts. You’ll learn a clean two-module layout (ECR and App Runner), how to parameterize environments, and how to validate the deployment with quick smoke tests or a full end‑to‑end script.
 
-## Project Structure
-- `modules/ecr`: Elastic Container Registry repository
-- `modules/apprunner`: App Runner service (pulls image from ECR)
-
 ## Prerequisites
 - Terraform, AWS CLI, Docker, and Node.js installed
 - AWS credentials configured (`aws configure`)
@@ -48,6 +44,13 @@ make smoke
 make smoke ENV=e2e-test
 ```
 
+## Tearing Down
+```bash
+make destroy
+# or
+make destroy ENV=e2e-test
+```
+
 ## End-to-End Test
 ```bash
 make e2e
@@ -56,13 +59,6 @@ What it does:
 - Creates ECR, builds and pushes the image
 - Deploys App Runner and waits for health
 - Runs basic checks and tears everything down
-
-## Tearing Down
-```bash
-make destroy
-# or
-make destroy ENV=e2e-test
-```
 
 ## Troubleshooting
 - Credentials: verify with `aws sts get-caller-identity`.
