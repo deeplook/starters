@@ -19,7 +19,7 @@ cp terraform.tfvars.example terraform.tfvars
 # Edit terraform.tfvars: aws_region, ecr_repository_name, image_tag,
 # docker_build_platform, app_service_name, and optionally environment (default: "prod")
 ```
-Note: All `make` commands accept `ENV=<name>` to override the environment (flows into `TF_VAR_environment`).
+Note: All `make` commands accept `ENV=<name>` to override the environment (flows into `TF_VAR_environment`). Replace `brew` and `open` commands for macOS used in the scripts with their equivalents for other platforms!
 
 ## Quickstart (Create ECR, build, push, deploy)
 ```bash
