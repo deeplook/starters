@@ -21,19 +21,26 @@ fi
 # --- Helper function to parse variables from .tfvars file ---
 get_tf_var() {
     local var_name=$1
-    local var_value=$(grep -E "^\s*${var_name}\s*=" "$TF_VARS_FILE" | cut -d'=' -f2 | tr -d ' "')
+    local default_value=$2
+    local line=$(grep -E "^\s*${var_name}\s*=" "$TF_VARS_FILE" | head -n1)
+    local var_value=$(echo "$line" | cut -d'=' -f2- | tr -d ' "')
     if [ -z "$var_value" ]; then
-        echo "Error: Variable '${var_name}' not found in $TF_VARS_FILE" >&2
-        exit 1
+        if [ -n "$default_value" ]; then
+            echo "$default_value"
+        else
+            echo "Error: Variable '${var_name}' not found in $TF_VARS_FILE" >&2
+            exit 1
+        fi
+    else
+        echo "$var_value"
     fi
-    echo "$var_value"
 }
 
 # --- Read variables from terraform.tfvars ---
 echo "Reading configuration from $TF_VARS_FILE..."
 AWS_REGION=$(get_tf_var "aws_region")
 ECR_REPO_BASE_NAME=$(get_tf_var "ecr_repository_name")
-ENVIRONMENT=$(get_tf_var "environment")
+ENVIRONMENT=$(get_tf_var "environment" "prod")
 DOCKER_PLATFORM=$(get_tf_var "docker_build_platform")
 IMAGE_TAG=$(get_tf_var "image_tag")
 
@@ -74,3 +81,15 @@ docker push "$ECR_IMAGE_URI"
 
 echo ""
 echo "✅ Successfully pushed image to ECR: $ECR_IMAGE_URI"
+
+# --- Deploy or Update App Runner Service ---
+echo "Deploying App Runner service via Terraform..."
+terraform apply --auto-approve -var="create_apprunner_service=true"
+
+SERVICE_URL=$(terraform output -raw app_service_url || true)
+if [ -n "$SERVICE_URL" ]; then
+  echo ""
+  echo "App Runner service URL: https://$SERVICE_URL"
+  echo "You can watch it come up and then run smoke tests with:"
+  echo "  ./run_smoke_tests.sh $SERVICE_URL"
+fi

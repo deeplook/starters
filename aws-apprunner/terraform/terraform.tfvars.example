@@ -1,6 +1,9 @@
 # AWS Configuration
 aws_region = "eu-central-1"
 
+# Environment
+environment = "prod"
+
 # ECR Configuration
 ecr_repository_name = "node-app-repo"
 image_tag           = "latest"
