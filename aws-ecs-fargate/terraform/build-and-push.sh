@@ -34,7 +34,7 @@ echo "Authentication successful."
 
 # --- Build & Push ---
 echo "Building the Docker image from ${PROJECT_ROOT}..."
-docker build --platform linux/amd64 -t "${REPOSITORY_NAME}:${IMAGE_TAG}" "${PROJECT_ROOT}"
+docker build --platform linux/amd64 -f "${PROJECT_ROOT}/Dockerfile" -t "${REPOSITORY_NAME}:${IMAGE_TAG}" "${PROJECT_ROOT}"
 echo "Docker image build successful."
 
 echo "Tagging Docker image for ECR..."
