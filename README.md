@@ -1,6 +1,6 @@
 # Starters
 
-This is a collection of tested building blocks for various frameworks and tools to get started and expand on more quickly. Each one has a testsuite and can be used with Docker.
+This is a collection of tested patterns, blueprints, recipes, you name it... for various service,s frameworks and tools to get started and expand on more quickly. Each one has a testsuite and can be used with Docker. Installation commands are leaned toward brew on macOS, but should be easy to modify.
 
 ## Content
 
