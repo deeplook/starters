@@ -63,7 +63,7 @@ infra:
 
 .PHONY: build
 build:
-	PROJECT_NAME="$(PROJECT_NAME)" AWS_REGION="$(AWS_REGION)" ENVIRONMENT="$(ENV)" IMAGE_TAG="$(IMAGE_TAG)" ./build-and-push.sh
+	cd terraform && PROJECT_NAME="$(PROJECT_NAME)" AWS_REGION="$(AWS_REGION)" ENVIRONMENT="$(ENV)" IMAGE_TAG="$(IMAGE_TAG)" ./build-and-push.sh
 
 .PHONY: deploy
 deploy: infra build

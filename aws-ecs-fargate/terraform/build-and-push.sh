@@ -10,11 +10,14 @@ PROJECT_NAME="${PROJECT_NAME:-my-web-app}"
 ENVIRONMENT="${ENVIRONMENT:-dev}"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
 
-# --- Script ---
+# Directories
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # Construct the repository name
 REPOSITORY_NAME="${PROJECT_NAME}-${ENVIRONMENT}"
 
+# --- AWS Account and ECR login ---
 echo "Retrieving AWS Account ID..."
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 if [ $? -ne 0 ] || [ -z "$AWS_ACCOUNT_ID" ]; then
@@ -23,15 +26,15 @@ if [ $? -ne 0 ] || [ -z "$AWS_ACCOUNT_ID" ]; then
 fi
 echo "AWS Account ID: ${AWS_ACCOUNT_ID}"
 
-# Construct the full ECR repository URI
 ECR_REPOSITORY_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPOSITORY_NAME}"
 
 echo "Authenticating Docker to Amazon ECR..."
 aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 echo "Authentication successful."
 
-echo "Building the Docker image..."
-docker build --platform linux/amd64 -t "${REPOSITORY_NAME}:${IMAGE_TAG}" .
+# --- Build & Push ---
+echo "Building the Docker image from ${PROJECT_ROOT}..."
+docker build --platform linux/amd64 -t "${REPOSITORY_NAME}:${IMAGE_TAG}" "${PROJECT_ROOT}"
 echo "Docker image build successful."
 
 echo "Tagging Docker image for ECR..."

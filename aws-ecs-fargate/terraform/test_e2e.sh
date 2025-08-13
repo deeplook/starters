@@ -27,8 +27,8 @@ terraform apply -auto-approve
 
 # --- 2. Deployment Phase ---
 echo "--- 📦 Starting E2E Test: Build and Push Docker Image ---"
-# The build script is in the parent directory
-../build-and-push.sh
+# The build script is in the terraform directory
+./build-and-push.sh
 
 # --- 3. Verification Phase ---
 echo "--- 🔬 Starting E2E Test: Verification ---"
