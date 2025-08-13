@@ -20,6 +20,9 @@ help:
 	@echo "  destroy      Tear down all resources"
 	@echo "  e2e          Full end-to-end test"
 	@echo "  clean        Remove local TF artifacts"
+	@echo ""
+	@echo "Env vars:"
+	@echo "  ENV=<name>        Terraform environment (default: prod)"
 
 .PHONY: fmt
 fmt:
@@ -52,7 +55,7 @@ deploy:
 
 .PHONY: url
 url:
-	cd terraform && terraform output -raw app_service_url
+	cd terraform && echo http://$$(terraform output -raw app_service_url)
 
 .PHONY: open
 open:

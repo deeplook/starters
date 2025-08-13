@@ -3,6 +3,11 @@ name: App Runner End-to-End Test
 on:
   workflow_dispatch: # Allows manual triggering
 
+# Ensure only one run at a time; cancel older in-progress runs
+concurrency:
+  group: apprunner-e2e
+  cancel-in-progress: true
+
 # These permissions are required for the OIDC flow
 permissions:
   id-token: write
@@ -15,7 +20,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials (OIDC)
+        if: ${{ !env.ACT }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::629215267253:role/GitHubActionsRole # Role ARN from the aws-github-oidc terraform output
