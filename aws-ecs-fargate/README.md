@@ -6,7 +6,7 @@
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Shell](https://img.shields.io/badge/Shell-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
 
-This project provisions a complete, production-ready AWS ECS environment using Fargate. It includes a an ECR repository, a dashboard service, an ECS task definition, a load balancer, and all the necessary networking and IAM components.
+This project provisions a complete, production-ready AWS ECS environment using Fargate. It includes a an ECR repository, a dashboard service based on Python and FastHTML, an ECS task definition, a load balancer, and all the necessary networking and IAM components.
 
 The setup is designed to deploy a custom dummy Python application using MonsterUI defined in `dashboard.py` and the `Dockerfile`.
 
@@ -18,51 +18,42 @@ The setup is designed to deploy a custom dummy Python application using MonsterU
 4.  **Terraform CLI**: Ensure you have the [Terraform](https://developer.hashicorp.com/terraform) CLI installed ([OpenTofu](https://opentofu.org/) will also work).
 5.  **jq**: A lightweight and flexible command-line JSON processor, [jq](https://jqlang.org/) is nice to have, but not essential.
 
-## Usage
+## Configure
+```bash
+cp terraform/terraform.tfvars.example terraform/terraform.tfvars
+# Edit terraform/terraform.tfvars: project_name, aws_region, docker_image_tag
+```
 
-1.  **Clone/Copy Files**: Place all the project files in a new directory.
+## Quickstart (Make targets)
+```bash
+make setup      # initialize Terraform and bootstrap tfvars if missing
+make deploy     # apply infra (incl. ECR) and build+push image
 
-2.  **Create a Variables File**: In the `terraform` directory, copy the example variables file:
-    ```sh
-    cd terraform
-    cp terraform.tfvars.example terraform.tfvars
-    ```
+# Get and test the service URL
+make url        # prints http://<alb-dns>
+curl $(make -s url)
 
-3.  **Customize `terraform.tfvars`**: Open `terraform/terraform.tfvars` and fill in the required values for `project_name`, `aws_region`, and `docker_image_tag`. It is recommended to use a unique tag for each new image, such as the Git commit SHA.
+# Or open in a browser (macOS)
+make open
+```
 
-4.  **Initialize Terraform**: Run `terraform init` from the `terraform` directory.
-    ```sh
-    cd terraform
-    terraform init
-    ```
-
-5.  **First Deployment**: Apply the configuration to create the initial infrastructure, including the ECR repository.
-    ```sh
-    terraform apply
-    ```
-
-6.  **Build and Push the Docker Image**: From the project root directory, run the `build-and-push.sh` script. This will build your Docker image for the `linux/amd64` platform and push it to the newly created ECR repository. ECS will detect and deploy it.
-    ```sh
-    cd ..
-    ./build-and-push.sh
-    ```
-    *Note 1: You may need to adjust the `AWS_REGION`, `PROJECT_NAME`, and `IMAGE_TAG` variables inside the script if they differ from your `terraform.tfvars`.*
-
-    *Note 2: You might run into docker login issues when running this over `ssh`.*
-
-7.  **Open the App**: After a minute or so you can access your running application.
-    ```sh
-    cd terraform
-    URL=$(terraform output -json | jq -r .load_balancer_dns_name.value)
-    open http://$URL
-    ```
+## Smoke Testing
+```bash
+make smoke
+```
+What it does:
+- Polls the Load Balancer URL until it returns HTTP 200
 
 ## Cleaning Up
-
-To destroy all the resources created by this project, run `terraform destroy` from within the `terraform` directory:
-```sh
-terraform destroy
+```bash
+make destroy
 ```
+
+## End-to-End Test
+```bash
+make e2e
+```
+`
 
 ```mermaid
 graph TD

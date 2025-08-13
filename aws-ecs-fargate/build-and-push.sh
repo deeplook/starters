@@ -4,12 +4,11 @@
 
 set -e # Exit immediately if a command exits with a non-zero status.
 
-# --- Configuration ---
-# You can change these variables
-AWS_REGION="eu-central-1"
-PROJECT_NAME="my-web-app"
-ENVIRONMENT="dev"
-IMAGE_TAG="latest"
+# --- Configuration (env-aware defaults) ---
+AWS_REGION="${AWS_REGION:-eu-central-1}"
+PROJECT_NAME="${PROJECT_NAME:-my-web-app}"
+ENVIRONMENT="${ENVIRONMENT:-dev}"
+IMAGE_TAG="${IMAGE_TAG:-latest}"
 
 # --- Script ---
 
