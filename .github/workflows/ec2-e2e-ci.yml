@@ -1,0 +1,37 @@
+name: EC2 End-to-End Test
+
+on:
+  workflow_dispatch: # Allows manual triggering
+
+# Ensure only one run at a time; cancel older in-progress runs
+concurrency:
+  group: ec2-e2e
+  cancel-in-progress: true
+
+# Permissions required for OIDC
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        if: ${{ !env.ACT }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::629215267253:role/GitHubActionsRole
+          aws-region: eu-central-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Run End-to-End Test
+        run: make e2e
+        working-directory: ./aws-ec2

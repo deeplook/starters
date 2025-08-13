@@ -24,9 +24,9 @@ resource "aws_instance" "main" {
 
   # Configure the root volume
   root_block_device {
-    volume_size = var.volume_size  # Size in GB (default is often 8 GB)
-    volume_type = "gp3"  # EBS volume type (gp3 is general-purpose SSD)
-    delete_on_termination = true  # Delete volume when instance is terminated
+    volume_size           = var.volume_size # Size in GB (default is often 8 GB)
+    volume_type           = "gp3"           # EBS volume type (gp3 is general-purpose SSD)
+    delete_on_termination = true            # Delete volume when instance is terminated
   }
 
   user_data = <<EOF

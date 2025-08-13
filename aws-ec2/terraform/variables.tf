@@ -27,3 +27,9 @@ variable "ec2_volume_size" {
   description = "The size of the root EBS volume in GB for the EC2 instance."
   type        = number
 }
+
+variable "environment" {
+  description = "Environment name to suffix resource identifiers and tags (e.g., prod, staging, e2e-test)."
+  type        = string
+  default     = "prod"
+}

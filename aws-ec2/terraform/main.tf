@@ -14,6 +14,14 @@ terraform {
 
 provider "aws" {
   region = var.region
+
+  default_tags {
+    tags = {
+      Project     = "EC2-Starter"
+      ManagedBy   = "Terraform"
+      Environment = var.environment
+    }
+  }
 }
 
 module "vpc" {
