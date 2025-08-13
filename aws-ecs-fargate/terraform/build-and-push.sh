@@ -17,6 +17,14 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 # Construct the repository name
 REPOSITORY_NAME="${PROJECT_NAME}-${ENVIRONMENT}"
 
+echo "SCRIPT_DIR=${SCRIPT_DIR}"
+echo "PROJECT_ROOT=${PROJECT_ROOT}"
+if [ ! -f "${PROJECT_ROOT}/Dockerfile" ]; then
+  echo "❌ Dockerfile not found at ${PROJECT_ROOT}/Dockerfile"
+  ls -la "${PROJECT_ROOT}" || true
+  exit 1
+fi
+
 # --- AWS Account and ECR login ---
 echo "Retrieving AWS Account ID..."
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
