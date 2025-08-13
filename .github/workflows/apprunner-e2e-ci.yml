@@ -27,34 +27,5 @@ jobs:
           terraform_version: 1.5.7
 
       - name: Run End-to-End Test
-        run: |
-          # Step 1: Create a temporary tfvars file for the E2E run
-          # We explicitly set create_apprunner_service to false for the first run.
-          echo "--- 📝 Creating terraform.tfvars for E2E ---"
-          cp terraform.tfvars.example terraform.tfvars
-          echo 'environment = "e2e-test"' >> terraform.tfvars
-          echo 'create_apprunner_service = false' >> terraform.tfvars
-
-          # Step 2: Provision ONLY the ECR repository
-          echo "--- 🚀 Provisioning ECR Repository ---"
-          rm -rf .terraform
-          terraform init
-          terraform apply -auto-approve
-
-          # Step 3: Build and push the application image to the new repository
-          echo "--- 📦 Building and Pushing Docker Image ---"
-          ./push_image.sh
-
-          # Step 4: Provision the App Runner service, which now has a valid image
-          echo "--- 🚀 Provisioning App Runner Service ---"
-          terraform apply -auto-approve -var="create_apprunner_service=true"
-
-          # Step 5: Run smoke tests against the live service
-          echo "--- 🔬 Running Smoke Tests ---"
-          SERVICE_URL=$(terraform output -raw app_service_url)
-          ./run_smoke_tests.sh $SERVICE_URL
-
-          # Step 6: Clean up all temporary resources
-          echo "--- 🧹 Destroying Temporary E2E Environment ---"
-          terraform destroy -auto-approve -var="create_apprunner_service=true"
-        working-directory: ./aws-apprunner/terraform
+        run: make e2e ENV=e2e-test
+        working-directory: ./aws-apprunner
