@@ -5,8 +5,8 @@ aws_region = "eu-central-1"
 environment = "prod"
 
 # ECR Configuration
-ecr_repository_name = "node-app-repo"
-image_tag           = "latest"
+ecr_repository_name   = "node-app-repo"
+image_tag             = "latest"
 docker_build_platform = "linux/amd64"
 
 # App Runner Service Configuration
@@ -36,6 +36,6 @@ app_environment_variables = {
 }
 
 # Tags
-app_tags = {
+common_tags = {
   Name = "NodeAppService"
 }
