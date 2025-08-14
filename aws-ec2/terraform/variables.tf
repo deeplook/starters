@@ -14,7 +14,7 @@ variable "subnet_cidr" {
 }
 
 variable "instance_type" {
-  description = "The type of the EC2 instance."
+  description = "The EC2 instance type to use. Choose based on your needs: t2/t3.micro for testing, t2/t3.small for development, t2/t3.medium or larger for production. Note that not all instance types are available in all regions."
   type        = string
 }
 
