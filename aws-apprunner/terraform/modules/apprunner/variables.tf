@@ -1,12 +1,3 @@
-# Specifies the AWS region where all resources will be deployed.
-variable "aws_region" {
-  description = "The AWS region to deploy the resources to."
-  type        = string
-  default     = "eu-central-1"
-}
-
-
-
 # Defines the full image identifier for the application's Docker image.
 variable "app_image_identifier" {
   description = "The full URI of the Docker image in ECR (e.g., 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-repo:latest)."

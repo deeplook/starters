@@ -13,6 +13,7 @@ variable "image_tag" {
   type        = string
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "docker_build_platform" {
   description = "The target platform for the Docker build (e.g., 'linux/amd64')."
   type        = string

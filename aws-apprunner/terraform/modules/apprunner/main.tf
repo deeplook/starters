@@ -1,16 +1,23 @@
+terraform {
+  required_version = ">= 1.5.0"
 
-
-
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
 
 # Creates an IAM role that the App Runner service will assume to get permissions.
 resource "aws_iam_role" "apprunner_role" {
   name = "AppRunnerECRAccessRole-${var.environment}"
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17",
+    Version = "2012-10-17",
     Statement = [
       {
-        Action    = "sts:AssumeRole",
-        Effect    = "Allow",
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
         Principal = {
           Service = "build.apprunner.amazonaws.com"
         }
@@ -40,7 +47,7 @@ locals {
 
 # Provisions the App Runner service to run the containerized application.
 resource "aws_apprunner_service" "app_service" {
-  service_name = var.app_service_name
+  service_name                   = var.app_service_name
   auto_scaling_configuration_arn = aws_apprunner_auto_scaling_configuration_version.app_autoscale.arn
 
   source_configuration {
@@ -48,7 +55,7 @@ resource "aws_apprunner_service" "app_service" {
       image_identifier      = var.app_image_identifier
       image_repository_type = local.is_public_image ? "ECR_PUBLIC" : "ECR"
       image_configuration {
-        port                            = var.app_port
+        port                          = var.app_port
         runtime_environment_variables = var.app_environment_variables
       }
     }
@@ -68,9 +75,9 @@ resource "aws_apprunner_service" "app_service" {
   health_check_configuration {
     protocol = "HTTP"
     # The public placeholder image responds at '/', not the custom health check path.
-    path     = local.is_public_image ? "/" : var.app_health_check_path
-    interval = var.app_health_check_interval
-    timeout  = var.app_health_check_timeout
+    path                = local.is_public_image ? "/" : var.app_health_check_path
+    interval            = var.app_health_check_interval
+    timeout             = var.app_health_check_timeout
     healthy_threshold   = var.app_healthy_threshold
     unhealthy_threshold = var.app_unhealthy_threshold
   }

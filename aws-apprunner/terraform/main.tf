@@ -1,4 +1,6 @@
 terraform {
+  required_version = ">= 1.5.0"
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -28,7 +30,6 @@ module "apprunner" {
   count = var.create_apprunner_service ? 1 : 0
 
   source                    = "./modules/apprunner"
-  aws_region                = var.aws_region
   app_image_identifier      = var.app_image_identifier_override != null ? var.app_image_identifier_override : "${module.ecr.repository_url}:${var.image_tag}"
   app_environment_variables = var.app_environment_variables
   app_service_name          = "${var.app_service_name}-${var.environment}"
