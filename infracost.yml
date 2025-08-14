@@ -1,0 +1,26 @@
+version: 0.1
+projects:
+  - path: ./aws-apprunner/terraform
+    name: AWS App Runner
+    usage:
+      aws_apprunner_service:
+        monthly_compute_memory_gb: 2
+        monthly_compute_cpu: 1
+        monthly_requests: 100000
+
+  - path: ./aws-ec2/terraform
+    name: AWS EC2
+    usage:
+      aws_instance:
+        operating_system: linux
+        monthly_cpu_credit_hrs: 350
+        monthly_hrs: 730
+
+  - path: ./aws-ecs-fargate/terraform
+    name: AWS ECS Fargate
+    usage:
+      aws_ecs_service:
+        monthly_requests: 100000
+        vcpu_per_task: 0.25
+        memory_gb_per_task: 0.5
+        tasks: 2
