@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  aws_ecs_service:
+    monthly_requests: 100000
+    vcpu_per_task: 0.25
+    memory_gb_per_task: 0.5
+    tasks: 2

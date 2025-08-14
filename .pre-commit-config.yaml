@@ -15,9 +15,6 @@ repos:
     - id: infracost_breakdown
       args:
         - --args=--config-file=infracost.yml
-        - --args=--path=aws-apprunner/terraform
-        - --args=--path=aws-ec2/terraform
-        - --args=--path=aws-ecs-fargate/terraform
       verbose: true
 
 - repo: https://github.com/pre-commit/pre-commit-hooks

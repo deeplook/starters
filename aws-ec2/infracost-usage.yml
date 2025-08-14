@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  aws_instance:
+    operating_system: linux
+    monthly_cpu_credit_hrs: 350
+    monthly_hrs: 730
