@@ -1,0 +1,36 @@
+repos:
+- repo: https://github.com/terraform-docs/terraform-docs
+  rev: v0.20.0
+  hooks:
+    - id: terraform-docs-go
+      args: ["markdown", "table", "--output-file", "doc.md", "."]
+
+- repo: https://github.com/antonbabenko/pre-commit-terraform
+  rev: v1.100.0
+  hooks:
+    - id: terraform_fmt
+    - id: terraform_validate
+    - id: terraform_tflint
+    - id: terraform_docs
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v6.0.0
+  hooks:
+  - id: check-yaml
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+
+- repo: https://github.com/asottile/pyupgrade
+  rev: v3.20.0
+  hooks:
+  - id: pyupgrade
+    args: ["--py310-plus"]
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.12.8
+  hooks:
+    # Run the linter.
+    - id: ruff-check
+      args: [ --fix ]
+    # Run the formatter.
+    - id: ruff-format
