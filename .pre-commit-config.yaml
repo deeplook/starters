@@ -12,6 +12,13 @@ repos:
     - id: terraform_validate
     - id: terraform_tflint
     - id: terraform_docs
+    - id: infracost_breakdown
+      args:
+        - --args=--config-file=infracost.yml
+        - --args=--path=aws-apprunner/terraform
+        - --args=--path=aws-ec2/terraform
+        - --args=--path=aws-ecs-fargate/terraform
+      verbose: true
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0
