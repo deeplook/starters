@@ -22,7 +22,7 @@ help:
 	@echo "  clean        Remove local TF artifacts"
 	@echo ""
 	@echo "Env vars:"
-	@echo "  ENV=<name>        Terraform environment (default: prod)"
+	@echo "  ENV=<name>   Terraform environment (default: prod)"
 
 .PHONY: fmt
 fmt:
@@ -78,5 +78,7 @@ clean:
 	@echo "Cleaning up project..."
 	find . -type f -name 'doc.md' -delete
 	rm -f terraform/tf_outputs.env
-	rm -f terraform/terraform.tfstate terraform/terraform.tfstate.backup terraform/.terraform.lock.hcl
+	rm -f terraform/terraform.tfstate terraform/terraform.tfstate.backup
 	rm -rf terraform/.terraform
+	# Keep root module's .terraform.lock.hcl but remove from child modules
+	find terraform/modules -name .terraform.lock.hcl -delete
