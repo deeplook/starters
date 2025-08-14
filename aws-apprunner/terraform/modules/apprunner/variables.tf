@@ -72,7 +72,7 @@ variable "app_instance_memory" {
 
 # Defines the health check path.
 variable "app_health_check_path" {
-  description = "The health check path."
+  description = "The URL path for health checks. App Runner will send periodic HTTP GET requests to this path to monitor the application's health. Common values: '/' for a basic check, '/health' or '/status' for dedicated endpoints."
   type        = string
   default     = "/"
 }
