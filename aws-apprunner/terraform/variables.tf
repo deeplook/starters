@@ -37,77 +37,95 @@ variable "app_autoscale_config_name" {
 variable "app_max_concurrency" {
   description = "The maximum number of concurrent requests per instance."
   type        = number
+  default     = 100
 }
 
 variable "app_min_size" {
   description = "The minimum number of instances for the App Runner service."
   type        = number
+  default     = 1
 }
 
 variable "app_max_size" {
   description = "The maximum number of instances for the App Runner service."
   type        = number
+  default     = 10
 }
 
 variable "app_port" {
   description = "The port the application listens on."
-  type        = string
+  type        = number
+  default     = 3000
 }
 
 variable "app_instance_cpu" {
-  description = "The CPU units for the App Runner instance."
-  type        = string
+  description = "The CPU units for the App Runner instance (256, 512, 1024, 2048, or 4096)."
+  type        = number
+  default     = 1024
 }
 
 variable "app_instance_memory" {
-  description = "The memory for the App Runner instance."
-  type        = string
+  description = "The memory in MB for the App Runner instance (512, 1024, 2048, 3072, or 4096)."
+  type        = number
+  default     = 2048
 }
 
 variable "app_health_check_path" {
   description = "The health check path."
   type        = string
+  default     = "/"
 }
 
 variable "app_health_check_interval" {
-  description = "The health check interval."
+  description = "The health check interval in seconds."
   type        = number
+  default     = 5
 }
 
 variable "app_health_check_timeout" {
-  description = "The health check timeout."
+  description = "The health check timeout in seconds."
   type        = number
+  default     = 2
 }
 
 variable "app_healthy_threshold" {
-  description = "The healthy threshold for the health check."
+  description = "The number of consecutive successful health checks before marking as healthy."
   type        = number
+  default     = 2
 }
 
 variable "app_unhealthy_threshold" {
-  description = "The unhealthy threshold for the health check."
+  description = "The number of consecutive failed health checks before marking as unhealthy."
   type        = number
+  default     = 5
 }
 
-variable "app_tags" {
-  description = "Tags for the App Runner service."
-  type        = map(string)
+variable "environment" {
+  description = "The environment name (e.g., 'prod', 'staging', 'dev')."
+  type        = string
+  default     = "prod"
 }
 
 variable "create_apprunner_service" {
   description = "Whether to create the App Runner service."
   type        = bool
-  default     = false
-}
-
-variable "environment" {
-  description = "The environment name to append to resource names (e.g., 'prod', 'staging', 'e2e-test')."
-  type        = string
-  default     = "prod" # Your main service will be 'prod' by default
+  default     = true
 }
 
 variable "app_image_identifier_override" {
-  description = "If set, overrides the ECR image identifier for the App Runner service. Used for initial creation with a placeholder."
+  description = "Optional override for the App Runner service image identifier."
   type        = string
   default     = null
+}
+
+variable "common_tags" {
+  description = "Common tags to apply to all resources."
+  type        = map(string)
+  default     = {}
+}
+
+variable "additional_tags" {
+  description = "Additional tags to merge with common tags."
+  type        = map(string)
+  default     = {}
 }

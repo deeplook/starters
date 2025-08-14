@@ -45,6 +45,6 @@ module "apprunner" {
   app_health_check_timeout  = var.app_health_check_timeout
   app_healthy_threshold     = var.app_healthy_threshold
   app_unhealthy_threshold   = var.app_unhealthy_threshold
-  app_tags                  = var.app_tags
+  tags                      = merge(var.common_tags, var.additional_tags)
   environment               = var.environment
 }
