@@ -1,0 +1,54 @@
+name: Infracost
+on:
+  pull_request:
+    paths:
+      - 'aws-**/terraform/**'
+      - '.github/workflows/infracost.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  infracost:
+    name: Calculate cost estimate
+    runs-on: ubuntu-latest
+    env:
+      TF_ROOT_APPRUNNER: ./aws-apprunner/terraform
+      TF_ROOT_EC2: ./aws-ec2/terraform
+      TF_ROOT_ECS: ./aws-ecs-fargate/terraform
+
+    steps:
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.base.ref }}'
+
+      - name: Generate Infracost cost estimate baseline
+        run: |
+          infracost breakdown --config-file=infracost.yml \
+            --format=json \
+            --out-file=/tmp/infracost-base.json
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Generate Infracost diff
+        run: |
+          infracost diff --config-file=infracost.yml \
+            --format=json \
+            --compare-to=/tmp/infracost-base.json \
+            --out-file=/tmp/infracost.json
+
+      - name: Post Infracost comment
+        run: |
+          infracost comment github --path=/tmp/infracost.json \
+            --repo=$GITHUB_REPOSITORY \
+            --github-token=${{ github.token }} \
+            --pull-request=${{ github.event.pull_request.number }} \
+            --behavior=update
