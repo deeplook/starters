@@ -1,10 +1,4 @@
 repos:
-- repo: https://github.com/terraform-docs/terraform-docs
-  rev: v0.20.0
-  hooks:
-    - id: terraform-docs-go
-      args: ["markdown", "table", "--output-file", "doc.md", "."]
-
 - repo: https://github.com/antonbabenko/pre-commit-terraform
   rev: v1.100.0
   hooks:
@@ -12,6 +6,10 @@ repos:
     - id: terraform_validate
     - id: terraform_tflint
     - id: terraform_docs
+      args:
+        - --hook-config=--path-to-file=TERRAFORM.md     # use separate file for Terraform docs
+        - --hook-config=--create-file-if-not-exist=true # create if not exists
+        - --args=--config=.terraform-docs.yml           # use common config file
     - id: infracost_breakdown
       args:
         - --args=--config-file=infracost.yml
