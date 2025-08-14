@@ -7,10 +7,9 @@ repos:
     - id: terraform_tflint
     - id: terraform_docs
       args:
-        - --hook-config=--path-to-file=TERRAFORM.md     # use separate file for Terraform docs
-        - --hook-config=--create-file-if-not-exist=true # create if not exists
-        - --args=--config=.terraform-docs.yml           # use common config file
-      files: ^(aws-[^/]+/terraform/.*|aws-[^/]+/terraform/modules/.*/)?[^/]*\.tf$
+        - --args=--lockfile=false
+        - --args=--output-file=TERRAFORM.md
+        - --args=--output-mode=replace
     - id: infracost_breakdown
       args:
         - --args=--config-file=infracost.yml
