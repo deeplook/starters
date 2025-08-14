@@ -5,10 +5,6 @@ version: ">= 0.14.0"
 header-from: main.tf
 footer-from: ""
 
-recursive:
-  enabled: true
-  path: modules
-
 sections:
   hide: []
   show: []
