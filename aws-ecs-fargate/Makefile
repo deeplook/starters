@@ -27,7 +27,9 @@ help:
 	@echo "  destroy      terraform destroy -auto-approve (ENV=$(ENV))"
 	@echo "  e2e          Run full end-to-end test"
 	@echo "  clean        Remove local TF artifacts and generated docs"
-	@echo "  test-e2e     Alias for e2e (backwards compatibility)"
+	@echo ""
+	@echo "Env vars:"
+	@echo "  ENV=<name>   Terraform environment (default: dev)"
 
 .PHONY: fmt
 fmt:
@@ -104,8 +106,7 @@ clean:
 	@echo "Cleaning up project..."
 	find . -type f -name 'doc.md' -delete
 	rm -f terraform/tf_outputs.env
-	rm -f terraform/terraform.tfstate terraform/terraform.tfstate.backup terraform/.terraform.lock.hcl
+	rm -f terraform/terraform.tfstate terraform/terraform.tfstate.backup
 	rm -rf terraform/.terraform
-
-.PHONY: test-e2e
-test-e2e: e2e
+	# Keep root module's .terraform.lock.hcl but remove from child modules
+	find terraform/modules -name .terraform.lock.hcl -delete
