@@ -1,5 +1,12 @@
-# This file defines the AWS IAM OpenID Connect (OIDC) provider for GitHub Actions
-# and creates an IAM role that can be assumed by a specific GitHub repository.
+terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
 
 # Configure the AWS provider
 provider "aws" {
@@ -25,8 +32,14 @@ resource "aws_iam_openid_connect_provider" "github" {
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
 
+# Build list of allowed repo subjects
+locals {
+  allowed_repos = concat([var.github_repo], var.additional_repos)
+  allowed_subs  = [for r in local.allowed_repos : "repo:${var.github_org}/${r}:*"]
+}
+
 # Build the IAM policy document that specifies who can assume the role.
-# It trusts the OIDC provider and restricts access to a specific GitHub repository.
+# It trusts the OIDC provider and restricts access to specific GitHub repositories.
 data "aws_iam_policy_document" "github_actions_trust_policy" {
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
@@ -36,12 +49,11 @@ data "aws_iam_policy_document" "github_actions_trust_policy" {
       identifiers = [aws_iam_openid_connect_provider.github.arn]
     }
 
-    # Condition to scope down access to a specific GitHub repository.
-    # This ensures that only workflows from this repo can assume the role.
+    # Condition to scope down access to specific GitHub repositories.
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_org}/${var.github_repo}:*"]
+      values   = local.allowed_subs
     }
 
     condition {

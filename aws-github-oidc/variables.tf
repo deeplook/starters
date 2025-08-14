@@ -8,6 +8,12 @@ variable "github_repo" {
   type        = string
 }
 
+variable "additional_repos" {
+  description = "Additional GitHub repositories (names only) within github_org to trust."
+  type        = list(string)
+  default     = []
+}
+
 variable "role_name" {
   description = "The name of the IAM role to create."
   type        = string
