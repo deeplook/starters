@@ -46,4 +46,5 @@ module "apprunner" {
   app_healthy_threshold     = var.app_healthy_threshold
   app_unhealthy_threshold   = var.app_unhealthy_threshold
   app_tags                  = var.app_tags
+  environment               = var.environment
 }

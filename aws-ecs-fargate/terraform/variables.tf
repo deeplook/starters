@@ -56,12 +56,6 @@ variable "container_memory" {
   default     = 512
 }
 
-variable "desired_task_count" {
-  description = "The desired number of tasks to run for the service."
-  type        = number
-  default     = 2
-}
-
 # ------------------------------------------------------------------------------
 # AUTOSCALING CONFIGURATION
 # ------------------------------------------------------------------------------

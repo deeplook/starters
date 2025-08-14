@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 provider "aws" {
   region = var.aws_region
 }
@@ -5,7 +15,6 @@ provider "aws" {
 module "network" {
   source = "./modules/network"
 
-  aws_region     = var.aws_region
   project_name   = var.project_name
   environment    = var.environment
   vpc_id         = var.vpc_id
