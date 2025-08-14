@@ -21,7 +21,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configure AWS Credentials (OIDC)
-        if: ${{ !env.ACT }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::629215267253:role/GitHubActionsRole

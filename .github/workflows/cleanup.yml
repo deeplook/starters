@@ -1,0 +1,64 @@
+name: AWS E2E Test Cleanup
+
+# This workflow is triggered automatically when another workflow run completes.
+on:
+  workflow_run:
+    workflows:
+      - "App Runner End-to-End Test"
+      - "EC2 End-to-End Test"
+      - "ECS Fargate End-to-End Test"
+    types:
+      - completed
+  workflow_dispatch: # Allows manual triggering
+
+permissions:
+  id-token: write   # Required for OIDC authentication
+  contents: read    # Required to check out the repository
+
+jobs:
+  cleanup:
+    if: github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout specific commit that failed
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::629215267253:role/GitHubActionsRole
+          aws-region: eu-central-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Run Terraform Destroy for App Runner
+        if: github.event.workflow_run.name == 'App Runner End-to-End Test'
+        run: |
+          echo "--- 🧹 Cleaning up failed App Runner E2E resources ---"
+          cd aws-apprunner/terraform
+          rm -rf .terraform
+          terraform init
+          terraform destroy -auto-approve -var-file="e2e.tfvars"
+
+      - name: Run Terraform Destroy for EC2
+        if: github.event.workflow_run.name == 'EC2 End-to-End Test'
+        run: |
+          echo "--- 🧹 Cleaning up failed EC2 E2E resources ---"
+          cd aws-ec2/terraform
+          rm -rf .terraform
+          terraform init
+          terraform destroy -auto-approve ENV=e2e-test
+
+      - name: Run Terraform Destroy for ECS Fargate
+        if: github.event.workflow_run.name == 'ECS Fargate End-to-End Test'
+        run: |
+          echo "--- 🧹 Cleaning up failed ECS Fargate E2E resources ---"
+          cd aws-ecs-fargate/terraform
+          rm -rf .terraform
+          terraform init
+          terraform destroy -auto-approve ENV=e2e-test
