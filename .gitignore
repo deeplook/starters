@@ -238,5 +238,8 @@ terraform.rc
 # Plan files
 *tfplan*
 
-# Explicitly keep lock files
+# Explicitly keep lock files at project roots, but ignore inside modules
 !.terraform.lock.hcl
+!*/.terraform.lock.hcl
+!*/terraform/.terraform.lock.hcl
+**/modules/**/.terraform.lock.hcl
