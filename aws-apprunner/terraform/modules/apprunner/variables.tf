@@ -51,7 +51,7 @@ variable "app_max_size" {
 
 # Defines the port the application listens on.
 variable "app_port" {
-  description = "The port the application listens on."
+  description = "The port number that the application listens on. This port will be exposed by the container and used for incoming traffic. Common values: 3000 for Node.js, 8080 for Java, 5000 for Python."
   type        = number
   default     = 3000
 }
