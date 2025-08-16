@@ -1,7 +1,4 @@
-# Terraform Documentation
-
-
-
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 No requirements.
@@ -34,3 +31,4 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_repository_url"></a> [repository\_url](#output\_repository\_url) | The URL of the ECR repository |
+<!-- END_TF_DOCS -->

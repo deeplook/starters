@@ -50,7 +50,7 @@ tf-docs:
 	  exit 1; \
 	}
 	@echo "Generating Terraform documentation..."
-	@terraform-docs markdown --recursive --output-file doc.md ./terraform
+	cd terraform && terraform-docs markdown --recursive --lockfile=false --output-file TERRAFORM.md --output-mode replace .
 
 .PHONY: setup
 setup:
@@ -104,7 +104,7 @@ e2e:
 .PHONY: clean
 clean:
 	@echo "Cleaning up project..."
-	find . -type f -name 'doc.md' -delete
+	rm -rf .ruff_cache
 	rm -f terraform/tf_outputs.env
 	rm -f terraform/terraform.tfstate terraform/terraform.tfstate.backup
 	rm -rf terraform/.terraform
