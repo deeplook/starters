@@ -38,7 +38,6 @@ The `.env` file is always prioritized over the shell environment variables.
 """
 
 import os
-from typing import Tuple
 
 from pydantic import ValidationError
 from pydantic_settings import (
@@ -70,7 +69,7 @@ class Settings(BaseSettings):
         env_settings: PydanticBaseSettingsSource,
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
-    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
         return (
             init_settings,
             dotenv_settings,

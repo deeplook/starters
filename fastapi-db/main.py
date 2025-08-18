@@ -5,7 +5,7 @@ using a SQLite database for storage.
 
 import os
 from contextlib import asynccontextmanager
-from typing import Annotated, List
+from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlmodel import Session
@@ -45,7 +45,7 @@ app = FastAPI(lifespan=lifespan)
 DBSession = Annotated[Session, Depends(get_session)]
 
 
-@app.get("/items", response_model=List[models.Item])
+@app.get("/items", response_model=list[models.Item])
 def read_items(session: DBSession):
     """Retrieve all items."""
     return crud.get_items(session=session)

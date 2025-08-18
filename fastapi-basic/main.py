@@ -2,8 +2,6 @@
 This is a minimal FastAPI server that implements all HTTP methods.
 """
 
-from typing import List, Optional
-
 from dotenv import dotenv_values
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -16,16 +14,16 @@ PORT = int(env.get("PORT", "8000"))
 class Item(BaseModel):
     id: int
     name: str
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class UpdateItem(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
+    name: str | None = None
+    description: str | None = None
 
 
 # Pseudo-database
-items: List[Item] = [
+items: list[Item] = [
     Item(id=1, name="Item 1", description="This is the first item."),
     Item(id=2, name="Item 2", description="This is the second item."),
 ]
@@ -35,8 +33,8 @@ next_id = 3
 app = FastAPI()
 
 
-@app.get("/items", response_model=List[Item])
-async def read_items() -> List[Item]:
+@app.get("/items", response_model=list[Item])
+async def read_items() -> list[Item]:
     """Retrieve all items."""
     return items
 

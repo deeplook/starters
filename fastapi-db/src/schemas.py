@@ -1,11 +1,9 @@
-from typing import Optional
-
 from sqlmodel import SQLModel
 
 
 class ItemBase(SQLModel):
     name: str
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class ItemCreate(ItemBase):
@@ -13,5 +11,5 @@ class ItemCreate(ItemBase):
 
 
 class ItemUpdate(SQLModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
+    name: str | None = None
+    description: str | None = None

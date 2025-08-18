@@ -1,14 +1,3 @@
-terraform {
-  required_version = ">= 1.5.0"
-
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
 # Creates an IAM role that the App Runner service will assume to get permissions.
 resource "aws_iam_role" "apprunner_role" {
   name = "AppRunnerECRAccessRole-${var.environment}"

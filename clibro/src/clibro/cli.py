@@ -5,10 +5,9 @@ import json
 import logging
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Annotated
 
 import typer
-from typing_extensions import Annotated
 
 from .config import APP_NAME, get_config_path, load_config
 from .core import increment
@@ -37,7 +36,7 @@ def version_callback(value: bool) -> None:
 @app.callback()
 def main(
     version: Annotated[
-        Optional[bool],
+        bool | None,
         typer.Option(
             "--version",
             callback=version_callback,
@@ -46,7 +45,7 @@ def main(
         ),
     ] = None,
     config_path: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option(
             "--config",
             help="Path to the configuration file.",
@@ -56,7 +55,7 @@ def main(
         ),
     ] = None,
     verbose: Annotated[
-        Optional[bool],
+        bool | None,
         typer.Option(
             "-v",
             "--verbose",
@@ -94,7 +93,7 @@ def inc(
 @config_app.command("show")
 def show_config(
     config_path: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option(
             "--config",
             help="Path to the configuration file.",
