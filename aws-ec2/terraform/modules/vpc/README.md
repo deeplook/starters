@@ -1,7 +1,4 @@
-# Terraform Documentation
-
-
-
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -44,3 +41,4 @@ No modules.
 |------|-------------|
 | <a name="output_subnet_id"></a> [subnet\_id](#output\_subnet\_id) | n/a |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | n/a |
+<!-- END_TF_DOCS -->

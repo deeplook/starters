@@ -8,7 +8,7 @@ repos:
     - id: terraform_docs
       args:
         - --args=--lockfile=false
-        - --args=--output-file=TERRAFORM.md
+        - --args=--output-file=README.md
         - --args=--output-mode=replace
     - id: infracost_breakdown
       args:

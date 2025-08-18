@@ -1,7 +1,4 @@
-# Terraform Documentation
-
-
-
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -39,6 +36,9 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_autoscale_cpu_target"></a> [autoscale\_cpu\_target](#input\_autoscale\_cpu\_target) | The target average CPU utilization (in percent) for autoscaling. | `number` | `75` | no |
+| <a name="input_autoscale_max_tasks"></a> [autoscale\_max\_tasks](#input\_autoscale\_max\_tasks) | The maximum number of tasks for autoscaling. | `number` | `3` | no |
+| <a name="input_autoscale_min_tasks"></a> [autoscale\_min\_tasks](#input\_autoscale\_min\_tasks) | The minimum number of tasks for autoscaling. | `number` | `1` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | The AWS region to deploy resources in. | `string` | n/a | yes |
 | <a name="input_container_cpu"></a> [container\_cpu](#input\_container\_cpu) | The CPU units to allocate to the container. | `number` | n/a | yes |
 | <a name="input_container_memory"></a> [container\_memory](#input\_container\_memory) | The memory (in MiB) to allocate to the container. | `number` | n/a | yes |
@@ -52,12 +52,10 @@ No modules.
 | <a name="input_project_name"></a> [project\_name](#input\_project\_name) | The name of the project. | `string` | n/a | yes |
 | <a name="input_public_subnet_ids"></a> [public\_subnet\_ids](#input\_public\_subnet\_ids) | The IDs of the public subnets. | `list(string)` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The ID of the VPC where the resources are deployed. | `string` | n/a | yes |
-| <a name="input_autoscale_cpu_target"></a> [autoscale\_cpu\_target](#input\_autoscale\_cpu\_target) | The target average CPU utilization (in percent) for autoscaling. | `number` | `75` | no |
-| <a name="input_autoscale_max_tasks"></a> [autoscale\_max\_tasks](#input\_autoscale\_max\_tasks) | The maximum number of tasks for autoscaling. | `number` | `3` | no |
-| <a name="input_autoscale_min_tasks"></a> [autoscale\_min\_tasks](#input\_autoscale\_min\_tasks) | The minimum number of tasks for autoscaling. | `number` | `1` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
 | <a name="output_load_balancer_dns_name"></a> [load\_balancer\_dns\_name](#output\_load\_balancer\_dns\_name) | The DNS name of the load balancer |
+<!-- END_TF_DOCS -->

@@ -43,7 +43,7 @@ tf-docs:
 	  exit 1; \
 	}
 	@echo "Generating Terraform documentation..."
-	cd terraform && terraform-docs markdown --recursive --lockfile=false --output-file TERRAFORM.md --output-mode replace .
+	cd terraform && terraform-docs markdown --recursive --lockfile=false --output-file README.md --output-mode replace .
 
 .PHONY: setup
 setup:

@@ -1,7 +1,4 @@
-# Terraform Documentation
-
-
-
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -49,3 +46,4 @@ No modules.
 | <a name="output_lb_sg_id"></a> [lb\_sg\_id](#output\_lb\_sg\_id) | The ID of the load balancer's security group. |
 | <a name="output_public_subnet_ids"></a> [public\_subnet\_ids](#output\_public\_subnet\_ids) | The IDs of the public subnets. |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC where the resources are deployed. |
+<!-- END_TF_DOCS -->
