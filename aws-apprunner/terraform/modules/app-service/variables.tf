@@ -1,8 +1,11 @@
-# Defines the full image identifier for the application's Docker image.
-variable "app_image_identifier" {
-  description = "The full URI of the Docker image in ECR (e.g., 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-repo:latest)."
+variable "ecr_repository_name" {
+  description = "The name of the ECR repository"
   type        = string
-  default     = null
+}
+
+variable "image_tag" {
+  description = "The tag of the Docker image in ECR (e.g., 'latest')."
+  type        = string
 }
 
 # Defines the environment variables for the App Runner service.

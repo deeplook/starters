@@ -14,8 +14,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_apprunner"></a> [apprunner](#module\_apprunner) | ./modules/apprunner | n/a |
-| <a name="module_ecr"></a> [ecr](#module\_ecr) | ./modules/ecr | n/a |
+| <a name="module_app-service"></a> [app-service](#module\_app-service) | ./modules/app-service | n/a |
 
 ## Resources
 
@@ -32,7 +31,6 @@ No resources.
 | <a name="input_app_health_check_path"></a> [app\_health\_check\_path](#input\_app\_health\_check\_path) | The health check path. | `string` | `"/"` | no |
 | <a name="input_app_health_check_timeout"></a> [app\_health\_check\_timeout](#input\_app\_health\_check\_timeout) | The health check timeout in seconds. | `number` | `2` | no |
 | <a name="input_app_healthy_threshold"></a> [app\_healthy\_threshold](#input\_app\_healthy\_threshold) | The number of consecutive successful health checks before marking as healthy. | `number` | `2` | no |
-| <a name="input_app_image_identifier_override"></a> [app\_image\_identifier\_override](#input\_app\_image\_identifier\_override) | Optional override for the App Runner service image identifier. | `string` | `null` | no |
 | <a name="input_app_instance_cpu"></a> [app\_instance\_cpu](#input\_app\_instance\_cpu) | The CPU units for the App Runner instance (256, 512, 1024, 2048, or 4096). | `number` | `1024` | no |
 | <a name="input_app_instance_memory"></a> [app\_instance\_memory](#input\_app\_instance\_memory) | The memory in MB for the App Runner instance (512, 1024, 2048, 3072, or 4096). | `number` | `2048` | no |
 | <a name="input_app_max_concurrency"></a> [app\_max\_concurrency](#input\_app\_max\_concurrency) | The maximum number of concurrent requests per instance. | `number` | `100` | no |

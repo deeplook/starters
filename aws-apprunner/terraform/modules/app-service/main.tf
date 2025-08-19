@@ -44,7 +44,7 @@ resource "aws_apprunner_service" "app_service" {
         port                          = var.app_port
         runtime_environment_variables = var.app_environment_variables
       }
-      image_identifier      = var.app_image_identifier
+      image_identifier      = "${aws_ecr_repository.this.repository_url}:${var.image_tag}"
       image_repository_type = "ECR"
     }
     authentication_configuration {
@@ -68,4 +68,28 @@ resource "aws_apprunner_service" "app_service" {
   }
 
   tags = var.tags
+}
+
+resource "aws_ecr_repository" "this" {
+  name         = var.ecr_repository_name
+  force_delete = true
+}
+
+resource "aws_ecr_lifecycle_policy" "this" {
+  repository = aws_ecr_repository.this.name
+
+  policy = jsonencode({
+    rules = [{
+      rulePriority = 1
+      description  = "Keep only one untagged image, expire all others"
+      selection = {
+        tagStatus   = "untagged"
+        countType   = "imageCountMoreThan"
+        countNumber = 1
+      }
+      action = {
+        type = "expire"
+      }
+    }]
+  })
 }

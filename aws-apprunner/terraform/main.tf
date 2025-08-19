@@ -10,16 +10,10 @@ provider "aws" {
   }
 }
 
-module "ecr" {
-  source              = "./modules/ecr"
-  ecr_repository_name = "${var.ecr_repository_name}-${var.environment}"
-}
-
-module "apprunner" {
-  count = var.create_apprunner_service ? 1 : 0
-
-  source                    = "./modules/apprunner"
-  app_image_identifier      = var.app_image_identifier_override != null ? var.app_image_identifier_override : "${module.ecr.repository_url}:${var.image_tag}"
+module "app-service" {
+  source                    = "./modules/app-service"
+  ecr_repository_name       = "${var.ecr_repository_name}-${var.environment}"
+  image_tag                 = var.image_tag
   app_environment_variables = var.app_environment_variables
   app_service_name          = "${var.app_service_name}-${var.environment}"
   app_autoscale_config_name = "${var.app_autoscale_config_name}-${var.environment}"

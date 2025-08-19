@@ -112,12 +112,6 @@ variable "create_apprunner_service" {
   default     = true
 }
 
-variable "app_image_identifier_override" {
-  description = "Optional override for the App Runner service image identifier."
-  type        = string
-  default     = null
-}
-
 variable "common_tags" {
   description = "Common tags to apply to all resources."
   type        = map(string)
