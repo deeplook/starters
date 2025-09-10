@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timezone
 
 
-LOG_FILE = "/tmp/mac_stats.log"
+LOG_FILE = "mac_stats.log"
 
 
 def get_cpu_usage():

@@ -8,6 +8,7 @@ dependencies = [
     "ipython>=9.5.0",
     "loki-logging-handler>=0.0.5",
     "pyloki>=0.2.1",
+    "grafanalib>=0.7.0",
 ]
 
 [dependency-groups]
