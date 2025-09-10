@@ -123,13 +123,13 @@ scrape_configs:
       component:
       power_source:
 
-bash mac_stats.sh &
+uv run mac_stats.py &
 
 sudo promtail -config.file=promtail-local-config.yaml
 
 logcli --quiet query '{component="mac_stats"}' --since 1d --limit 5
 
-pkill -f mac_stats.sh
+pkill -f mac_stats.py
 ```
 
 ## Grafana
