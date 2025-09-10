@@ -10,5 +10,6 @@ In alphabetical order:
 - [aws-ec2](https://github.com/deeplook/starters/tree/main/aws-ec2): A minimal AWS EC2 instance running a vanilla Nginx server.
 - [aws-ecs-fargate](https://github.com/deeplook/starters/tree/main/aws-ecs-fargate): An example of a small Python web application showing a dummy dashboard implemented with FastHTML/MonsterUI, dockerized, pushed to AWS ECR, installed on AWS ECS cluster with a load balancer.
 - [fastapi-basic](https://github.com/deeplook/starters/tree/main/fastapi-basic): A minimal, FastAPI server implementing most HTTP methods.
+- [log-processing](https://github.com/deeplook/starters/tree/main/log-processing): Some initial code using Loki, Promtail and Grafana.
 - Hexagonal architecture, more to come...
 - Twelve factor application, more to come...
