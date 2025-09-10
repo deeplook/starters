@@ -45,6 +45,7 @@ No modules.
 | <a name="input_app_port"></a> [app\_port](#input\_app\_port) | The port number that the application listens on. This port will be exposed by the container and used for incoming traffic. Common values: 3000 for Node.js, 8080 for Java, 5000 for Python. | `number` | `3000` | no |
 | <a name="input_app_service_name"></a> [app\_service\_name](#input\_app\_service\_name) | The name of the App Runner service. | `string` | `"node-app-service"` | no |
 | <a name="input_app_unhealthy_threshold"></a> [app\_unhealthy\_threshold](#input\_app\_unhealthy\_threshold) | The number of consecutive failed health checks before marking as unhealthy. | `number` | `5` | no |
+| <a name="input_create_apprunner_service"></a> [create\_apprunner\_service](#input\_create\_apprunner\_service) | Whether to create the App Runner service. | `bool` | `true` | no |
 | <a name="input_ecr_repository_name"></a> [ecr\_repository\_name](#input\_ecr\_repository\_name) | The name of the ECR repository | `string` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | The environment name (e.g., 'prod', 'staging', 'dev'). | `string` | `"prod"` | no |
 | <a name="input_image_tag"></a> [image\_tag](#input\_image\_tag) | The tag of the Docker image in ECR (e.g., 'latest'). | `string` | n/a | yes |

@@ -120,3 +120,9 @@ variable "environment" {
   type        = string
   default     = "prod"
 }
+
+variable "create_apprunner_service" {
+  description = "Whether to create the App Runner service."
+  type        = bool
+  default     = true
+}

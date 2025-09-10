@@ -1,0 +1,26 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: macbook_stats
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: macbook_stats
+      __path__: /tmp/mac_stats.log
+  pipeline_stages:
+  - json:
+      expressions:
+        component: component
+        cpu_usage_percent: cpu_usage_percent
+        memory_pressure_percent: memory_pressure_percent
+        battery_percentage: battery_percentage
+        power_source: power_source
+  - labels:
+      component:
+      power_source:
