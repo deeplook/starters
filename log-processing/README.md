@@ -90,7 +90,7 @@ logcli --quiet --output jsonl query '{app="pytest-test",source="test-runner"}' -
 
 Promtail is the official log collection agent for Loki that discovers and tails local log files, attaches identifying labels to the log streams, and ships them to a central Loki instance.
 
-We will create a tool, `mac_stats.sh`, that runs periodically in the background to take some system measurements like CPU usage... and save them to a log file `/tmp/mac_stats.log`. Then we write a config, `promtail-local-config.yaml`, for promtail in order to obseve this log file, collect newly added entries and pass them to loki.
+We will create a tool, `mac_stats.py`, that runs periodically in the background to take some system measurements like CPU usage... and save them to a log file `/tmp/mac_stats.log`. Then we write a config, `promtail-local-config.yaml`, for promtail in order to obseve this log file, collect newly added entries and pass them to loki.
 
 ```shell
 brew install promtail
