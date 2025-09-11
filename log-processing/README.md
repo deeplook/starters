@@ -137,6 +137,13 @@ pkill -f mac_stats.py
 ```shell
 brew install grafana
 brew services start grafana
+
+# This will need some paths to be changed, first:
+bash run_all.sh
+
+# open browser with http://localhost:3000
+
+# create a new Grafana dashboard imported from Mac-Stats-Dashboard-1757536800305.json
 ```
 
-More to come...
+In the end you should see two line charts from log data for CPU and memory usage.
