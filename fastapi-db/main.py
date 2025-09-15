@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi_mcp import FastApiMCP
 from sqlmodel import Session
 
 from src import crud, models, schemas
@@ -102,6 +103,10 @@ def delete_item(item_id: int, session: DBSession):
             status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
         )
     return
+
+
+mcp = FastApiMCP(app)
+mcp.mount()
 
 
 if __name__ == "__main__":

@@ -133,9 +133,55 @@ There are two ways to run the tests:
 
 Take this building block as a starting base to do things like the following:
 
+- Add a MCP server wrapping the FastAPI app to make its endpoints available inside a chat with LLM models.
 - Add a FastAPI [middleware](https://fastapi.tiangolo.com/tutorial/middleware/) for logging or benchmarking.
 - Add rate limitation with a package like [SlowAPI](https://slowapi.readthedocs.io/en/latest/).
 - Add user authentication and authorization using [FastAPI's security utilities](https://fastapi.tiangolo.com/tutorial/security/).
 - Implement more robust configuration management using [Pydantic's settings management](https://docs.pydantic.dev/latest/usage/settings/).
 - Enable Cross-Origin Resource Sharing (CORS) with [CORSMiddleware](https://fastapi.tiangolo.com/tutorial/cors/) to allow frontend applications to interact with the API.
 - Use [Background Tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) for long-running operations that don't need to be completed before the response is sent.
+
+The MCP server is already implemented. But you have to install some interface (desktop or CLI) to an LLM model. This was tested with Gemini and one entr in its settings like this:
+
+```shell
+❯ cat ~/.gemini/settings.json
+{
+    "theme": "Default",
+    "selectedAuthType": "gemini-api-key",
+    "hasSeenIdeIntegrationNudge": true,
+    "ideMode": true,
+    "mcpServers": {
+        "myapp-mcp": {
+            "url": "http://localhost:8002/mcp"
+        }
+    }
+}
+```
+
+Then inside Gemini CLI you can run queries like e.g.:
+
+```
+❯ gemini
+[...]
+
+> Add a new item with name "Napoleon" and description "Bonaparte".
+
+ ✓  create_item_items_post (smb-mcp MCP Server) {"name":"Napoleon","description":"Bonaparte"}
+    {
+        "name": "Napoleon",
+        "id": 2,
+        "description": "Bonaparte"
+    }
+
+> Modify item with name "Napolean" and set description to "Elba".
+
+I believe you meant to modify the item with the name "Napoleon". I will proceed with this change.
+[...]
+I have modified the item with ID 2 and set the description to "Elba".
+
+> Read that item.
+
+[...]
+✦ OK. Here is the item:
+   - Name: Napoleon, ID: 2, Description: Elba
+```
