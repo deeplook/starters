@@ -151,7 +151,7 @@ The MCP server is already implemented. But you have to install some interface (d
     "hasSeenIdeIntegrationNudge": true,
     "ideMode": true,
     "mcpServers": {
-        "myapp-mcp": {
+        "fastapi-db-mcp": {
             "url": "http://localhost:8002/mcp"
         }
     }
@@ -166,7 +166,7 @@ Then inside Gemini CLI you can run queries like e.g.:
 
 > Add a new item with name "Napoleon" and description "Bonaparte".
 
- ✓  create_item_items_post (smb-mcp MCP Server) {"name":"Napoleon","description":"Bonaparte"}
+ ✓  create_item_items_post (fastapi-db-mcp MCP Server) {"name":"Napoleon","description":"Bonaparte"}
     {
         "name": "Napoleon",
         "id": 2,
