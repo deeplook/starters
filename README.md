@@ -9,6 +9,7 @@ In alphabetical order:
 - [aws-apprunner](https://github.com/deeplook/starters/tree/main/aws-apprunner): A minimal example of a dummy NodeJS application, dockerized, pushed to AWS ECR and deployed as an AWS App Runner service (for single container applications).
 - [aws-ec2](https://github.com/deeplook/starters/tree/main/aws-ec2): A minimal AWS EC2 instance running a vanilla Nginx server.
 - [aws-ecs-fargate](https://github.com/deeplook/starters/tree/main/aws-ecs-fargate): An example of a small Python web application showing a dummy dashboard implemented with FastHTML/MonsterUI, dockerized, pushed to AWS ECR, installed on AWS ECS cluster with a load balancer.
+- [aws-lambda](https://github.com/deeplook/starters/tree/main/aws-lambda): An example of a small Python function using AWS S3 and Rekognition deployed as an AWS Lambda function.
 - [fastapi-basic](https://github.com/deeplook/starters/tree/main/fastapi-basic): A minimal, FastAPI server implementing most HTTP methods.
 - [log-processing](https://github.com/deeplook/starters/tree/main/log-processing): Some initial code using Loki, Promtail and Grafana.
 - Hexagonal architecture, more to come...
