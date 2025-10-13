@@ -5,4 +5,5 @@ python_service/bridge_pb2.py
 python_service/bridge_pb2.pyi
 python_service/bridge_pb2_grpc.py
 python_service/.venv/
+docker.env
 rust_service/target/

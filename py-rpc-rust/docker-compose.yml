@@ -8,10 +8,8 @@ services:
     container_name: python-grpc-service
     ports:
       - "50051:50051"
-    environment:
-      PYTHON_SERVICE_HOST: 0.0.0.0
-      PYTHON_SERVICE_PORT: 50051
-      RUST_SERVICE_ADDR: rust_service:50052
+    env_file:
+      - docker.env
     depends_on:
       rust_service:
         condition: service_healthy
@@ -29,10 +27,8 @@ services:
     container_name: rust-grpc-service
     ports:
       - "50052:50052"
-    environment:
-      RUST_SERVICE_HOST: 0.0.0.0
-      RUST_SERVICE_PORT: 50052
-      PYTHON_SERVICE_ADDR: http://python_service:50051
+    env_file:
+      - docker.env
     healthcheck:
       test: ["CMD", "grpc_health_probe", "-addr=localhost:50052"]
       interval: 30s

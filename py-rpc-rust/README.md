@@ -74,6 +74,13 @@ Whenever the Python service processes a request it also calls the Rust service u
 | `RUST_SERVICE_HOST` | `0.0.0.0` | Rust server | Bind address |
 | `RUST_SERVICE_PORT` | `50052` | Rust server | Listen port |
 | `PYTHON_SERVICE_ADDR` | `http://127.0.0.1:50051` | Rust client | Where to reach the Python service |
+| `PYTHON_GRPC_ENDPOINT` | `localhost:50051` | Tooling/CLI | Host:port target for Python gRPC calls |
+| `RUST_GRPC_ENDPOINT` | `localhost:50052` | Tooling/CLI | Host:port target for Rust gRPC calls |
+
+### Environment files
+
+- `.env` holds local development defaults. Copy `.env.example` to `.env` (and tweak as needed). The Makefile loads it automatically so `make python-server`, `make rust-client`, etc., inherit these values.
+- `docker.env` is consumed by `docker compose` to provide container-specific hostnames (e.g. `rust_service:50052`). Copy `docker.env.example` to `docker.env` when running in containers and adjust as needed.
 
 ## Docker usage
 
@@ -102,7 +109,7 @@ Because the images copy the shared `proto/` directory and regenerate stubs at bu
 You can also launch both via Docker Compose:
 
 ```bash
-docker compose up --build
+docker compose up --build  # reads docker.env for container settings
 ```
 
 The Python container waits for the Rust service to start before it begins accepting requests. Both expose their gRPC ports to the host on `50051` and `50052` respectively, and each container publishes a gRPC health check endpoint so Docker can report readiness (`grpc_health_probe` is baked into the images).

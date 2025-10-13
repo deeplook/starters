@@ -28,10 +28,6 @@ RUN curl -fsSL https://github.com/grpc-ecosystem/grpc-health-probe/releases/down
 
 COPY --from=builder /app/target/release/rust_service /usr/local/bin/rust_service
 
-ENV RUST_SERVICE_HOST=0.0.0.0 \
-    RUST_SERVICE_PORT=50052 \
-    PYTHON_SERVICE_ADDR=http://python_service:50051
-
 EXPOSE 50052
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
