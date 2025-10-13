@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  python_service:
+    build:
+      context: .
+      dockerfile: python_service/Dockerfile
+    container_name: python-grpc-service
+    ports:
+      - "50051:50051"
+    environment:
+      PYTHON_SERVICE_HOST: 0.0.0.0
+      PYTHON_SERVICE_PORT: 50051
+      RUST_SERVICE_ADDR: rust_service:50052
+    depends_on:
+      rust_service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-addr=localhost:50051"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  rust_service:
+    build:
+      context: .
+      dockerfile: rust_service/Dockerfile
+    container_name: rust-grpc-service
+    ports:
+      - "50052:50052"
+    environment:
+      RUST_SERVICE_HOST: 0.0.0.0
+      RUST_SERVICE_PORT: 50052
+      PYTHON_SERVICE_ADDR: http://python_service:50051
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-addr=localhost:50052"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

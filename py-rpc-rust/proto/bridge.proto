@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package bridge;
+
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloReply {
+  string message = 1;
+  string from_service = 2;
+}
+
+service PythonGreeter {
+  rpc SayHello (HelloRequest) returns (HelloReply);
+}
+
+service RustGreeter {
+  rpc SayHello (HelloRequest) returns (HelloReply);
+}
