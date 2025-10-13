@@ -121,6 +121,7 @@ Common workflows are wrapped in `make` targets at repo root:
 ```bash
 make python-generate   # uv sync + regenerate Python stubs
 make rust-build        # cargo build for the Rust binary
+make smoke-test        # build + run both locally, run CLI checks, shutdown
 make grpcurl-list-python
 make grpcurl-list-rust
 make compose-up        # build & run both services with health checks

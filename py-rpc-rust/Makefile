@@ -7,7 +7,7 @@ endif
 
 .PHONY: help python-sync python-generate python-server python-client \
 	python-clean rust-build rust-server rust-client rust-clean all-clean \
-	all-build compose-up \
+	all-build smoke-test compose-up \
 	docker-build-python docker-run-python docker-build-rust docker-run-rust \
 	grpcurl-python grpcurl-rust grpcurl-list-python grpcurl-list-rust
 
@@ -65,6 +65,26 @@ all-build: python-generate rust-build docker-build-python docker-build-rust  # B
 
 compose-up:  # Build and start both services via Docker Compose
 	docker compose up --build
+
+smoke-test:  # Build services, run both locally, execute CLI checks, then stop
+	$(MAKE) python-generate >/dev/null
+	$(MAKE) rust-build >/dev/null
+	@set -e; \
+	cleanup_port() { \
+	  if command -v lsof >/dev/null 2>&1; then \
+	    PIDS=$$(lsof -ti tcp:$$1 2>/dev/null); \
+	    if [ -n "$$PIDS" ]; then kill $$PIDS 2>/dev/null || true; sleep 1; fi; \
+	  fi; \
+	}; \
+	cleanup_port $(PYTHON_SERVICE_PORT); \
+	cleanup_port $(RUST_SERVICE_PORT); \
+	trap 'kill $$(jobs -p) 2>/dev/null || true' EXIT; \
+	(cd python_service && uv run python server.py) & \
+	sleep 3; \
+	(cd rust_service && cargo run -- server) & \
+	sleep 3; \
+	$(MAKE) python-client >/dev/null; \
+	$(MAKE) rust-client >/dev/null
 
 docker-build-python:  # Build the Python service container image
 	docker build -t python-grpc-service -f python_service/Dockerfile .
