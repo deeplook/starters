@@ -30,4 +30,5 @@ module "app-service" {
   app_unhealthy_threshold   = var.app_unhealthy_threshold
   tags                      = merge(var.common_tags, var.additional_tags)
   environment               = var.environment
+  create_apprunner_service  = var.create_apprunner_service
 }
