@@ -8,11 +8,12 @@ import logging
 import os
 
 import grpc
+from grpc_health.v1 import health, health_pb2, health_pb2_grpc
+from grpc_reflection.v1alpha import reflection
 
 import bridge_pb2
 import bridge_pb2_grpc
-from grpc_health.v1 import health, health_pb2, health_pb2_grpc
-from grpc_reflection.v1alpha import reflection
+
 
 _LOGGER = logging.getLogger("python_service.server")
 

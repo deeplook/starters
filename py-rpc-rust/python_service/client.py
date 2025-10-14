@@ -12,6 +12,7 @@ import grpc
 import bridge_pb2
 import bridge_pb2_grpc
 
+
 _DEFAULT_TARGET = os.getenv("RUST_SERVICE_ADDR", "localhost:50052")
 
 
