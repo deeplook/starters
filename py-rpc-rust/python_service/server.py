@@ -60,6 +60,7 @@ class PythonGreeter(bridge_pb2_grpc.PythonGreeterServicer):
 
 
 async def serve() -> None:
+    """Start the Python gRPC server."""
     server = grpc.aio.server()
     bridge_pb2_grpc.add_PythonGreeterServicer_to_server(PythonGreeter(), server)
 
@@ -79,6 +80,7 @@ async def serve() -> None:
 
 
 def main() -> None:
+    """Main entry point."""
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
     asyncio.run(serve())
 

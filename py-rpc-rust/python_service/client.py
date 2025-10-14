@@ -17,6 +17,7 @@ _DEFAULT_TARGET = os.getenv("RUST_SERVICE_ADDR", "localhost:50052")
 
 
 async def greet(name: str, target: str) -> None:
+    """Call the Rust gRPC service."""
     async with grpc.aio.insecure_channel(target) as channel:
         stub = bridge_pb2_grpc.RustGreeterStub(channel)
         response = await stub.SayHello(bridge_pb2.HelloRequest(name=name))
@@ -26,6 +27,7 @@ async def greet(name: str, target: str) -> None:
 
 
 def main() -> None:
+    """Main entry point."""
     parser = argparse.ArgumentParser(description="Call the Rust gRPC service")
     parser.add_argument("name", nargs="?", default="world", help="Name to greet")
     parser.add_argument(
