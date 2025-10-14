@@ -32,6 +32,8 @@ _REFLECTION_SERVICE_NAMES = (
 
 
 class PythonGreeter(bridge_pb2_grpc.PythonGreeterServicer):
+    """Implement the PythonGreeter service."""
+
     async def SayHello(
         self, request: bridge_pb2.HelloRequest, context: grpc.aio.ServicerContext
     ) -> bridge_pb2.HelloReply:
