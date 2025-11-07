@@ -1,5 +1,5 @@
 [project]
-name = "fastapi-basic"
+name = "fastapi-db"
 version = "0.1.0"
 description = "A minimal, tested FastAPI server implementing all HTTP methods."
 readme = "README.md"
