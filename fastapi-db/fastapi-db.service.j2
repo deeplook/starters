@@ -1,0 +1,22 @@
+[Unit]
+Description=FastAPI DB application
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ deploy_user }}
+WorkingDirectory={{ remote_deploy_base }}/{{ project_name }}-current
+# Load app env vars (if file uses KEY=VALUE lines)
+EnvironmentFile=-{{ remote_deploy_base }}/{{ project_name }}-current/myapp.env
+# Some code may also look for this pointer to the env file
+Environment=MYAPP_ENV_PATH={{ remote_deploy_base }}/{{ project_name }}-current/myapp.env
+# Prefer the venv binaries
+Environment=PATH={{ remote_deploy_base }}/{{ project_name }}-current/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+# Start the ASGI server
+ExecStart={{ remote_deploy_base }}/{{ project_name }}-current/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8003 --workers 2
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,396 @@
+---
+# =================================================================================
+# Ansible Playbook: FastAPI Application Deployment
+# =================================================================================
+#
+# PURPOSE:
+#   Automated deployment of FastAPI application with zero-downtime strategy:
+#   - Creates timestamped release directories (e.g., fastapi-db-20251107T203752Z)
+#   - Maintains a 'current' symlink pointing to the latest release
+#   - Enables rollback by keeping multiple releases
+#   - Manages systemd services (user or system scope) for process supervision
+#   - Uses templated service files for dynamic path configuration
+#
+# DEPLOYMENT STRATEGY:
+#   1. Validate required variables and local source directory
+#   2. Package source code into timestamped archive on control machine
+#   3. Transfer and extract archive to remote server
+#   4. Update 'current' symlink atomically
+#   5. Configure and restart systemd service (user or system scope based on service_scope variable)
+#   6. Clean up temporary files
+#
+# SERVICE SCOPE CHOICE:
+#   Supports both systemd USER and SYSTEM services, controlled by service_scope variable:
+#   - "user" (default): Services in ~/.config/systemd/user/ - per-user, managed by user
+#   - "system": Services in /etc/systemd/system/ - global, require root for management
+#
+#   User services: Runs as deploy user, no root required for management, isolated per-user
+#   System services: Global services, managed by system administrators, run as specified user
+#
+# WHEN TO USE SYSTEM SCOPE:
+#   - Multi-user applications that need to be managed by system administrators
+#   - Services that should run as a specific system user (not the deploy user)
+#   - Applications requiring root privileges or system-level access
+#   - Enterprise environments with centralized service management
+#
+# REQUIRED VARIABLES (must be overridden with -e):
+#   - local_src_dir: Absolute path to local project directory to deploy
+#   - remote_deploy_base: Absolute path to base directory on remote server for deployments
+#
+# OPTIONAL VARIABLES (can be overridden with -e):
+#   - service_scope: "user" (default) or "system" - Controls systemd service scope
+#
+# USAGE EXAMPLES:
+#
+# Default (user service):
+#   ansible-playbook -i scripts/gandi.ini scripts/deploy.yml -b -K \
+#     -e "local_src_dir=/Users/dinugherman/dev/starters/fastapi-db" \
+#     -e "remote_deploy_base=/home/dgherman/deployments"
+#
+# User service (explicit):
+#   ansible-playbook -i scripts/gandi.ini scripts/deploy.yml -b -K \
+#     -e "local_src_dir=/Users/dinugherman/dev/starters/fastapi-db" \
+#     -e "remote_deploy_base=/home/dgherman/deployments" \
+#     -e "service_scope=user"
+#
+# System service:
+#   ansible-playbook -i scripts/gandi.ini scripts/deploy.yml -b -K \
+#     -e "local_src_dir=/Users/dinugherman/dev/starters/fastapi-db" \
+#     -e "remote_deploy_base=/home/dgherman/deployments" \
+#     -e "service_scope=system"
+
+- name: Deploy source code to remote Ubuntu server
+  hosts: all
+  become: yes
+
+  # =================================================================================
+  # CONFIGURATION VARIABLES
+  # =================================================================================
+  vars:
+    # Project identification
+    project_name: "fastapi-db"
+
+    # Service scope: "user" (default) or "system"
+    # User services run per-user, system services are global and require root
+    service_scope: "user"
+
+    # REQUIRED: Source and destination paths (must be overridden via -e flag)
+    local_src_dir: "/path/to/local/project"        # Absolute path to local project directory
+    remote_deploy_base: "/path/to/remote/deployments"  # Base directory for deployments on remote server
+
+    # Derived paths (automatically calculated from above variables)
+    release_dir: "{{ remote_deploy_base }}/{{ project_name }}-{{ timestamp }}"        # Timestamped release directory
+    current_symlink: "{{ remote_deploy_base }}/{{ project_name }}-current"            # Symlink to current release
+    archive_name: "source-{{ timestamp }}.tar.gz"                                      # Archive filename with timestamp
+    local_tmp_archive: "/tmp/{{ archive_name }}"                                      # Local temporary archive path
+    remote_tmp_archive: "/tmp/{{ archive_name }}"                                     # Remote temporary archive path
+
+    # Dynamic user detection: Extract username from SSH-style inventory (user@host)
+    # Falls back to ansible_user or ansible_user_id if not in SSH format
+    deploy_user: "{{ (inventory_hostname is search('@')) | ternary(inventory_hostname | regex_replace('@.*$',''), (ansible_user | default(ansible_user_id))) }}"
+
+  # =================================================================================
+  # DEPLOYMENT TASKS
+  # =================================================================================
+  tasks:
+    # Generate UTC timestamp for release versioning (format: 20251107T203752Z)
+    - name: Set timestamp fact
+      ansible.builtin.set_fact:
+        timestamp: "{{ now(utc=True, fmt='%Y%m%dT%H%M%SZ') }}"
+
+    # =================================================================================
+    # VALIDATION PHASE: Ensure required variables are properly configured
+    # =================================================================================
+
+    # Prevent deployment with dummy/placeholder values
+    - name: Validate local_src_dir is overridden
+      ansible.builtin.assert:
+        that: local_src_dir != "/path/to/local/project"
+        fail_msg: |
+          ERROR: Required variable 'local_src_dir' not overridden!
+          Current dummy value: "{{ local_src_dir }}"
+
+          Please specify the local project directory using:
+          -e "local_src_dir=/path/to/your/project"
+
+          Example:
+          ansible-playbook -i scripts/gandi.ini scripts/deploy.yml -b -K \
+            -e "local_src_dir=/Users/username/projects/myapp" \
+            -e "remote_deploy_base=/home/deployer/apps"
+
+    # Prevent deployment with dummy/placeholder values
+    - name: Validate remote_deploy_base is overridden
+      ansible.builtin.assert:
+        that: remote_deploy_base != "/path/to/remote/deployments"
+        fail_msg: |
+          ERROR: Required variable 'remote_deploy_base' not overridden!
+          Current dummy value: "{{ remote_deploy_base }}"
+
+          Please specify the remote deployment base directory using:
+          -e "remote_deploy_base=/path/to/remote/deployments"
+
+          Example:
+          ansible-playbook -i scripts/gandi.ini scripts/deploy.yml -b -K \
+            -e "local_src_dir=/Users/username/projects/myapp" \
+            -e "remote_deploy_base=/home/deployer/apps"
+
+    - name: Validate service_scope is valid
+      ansible.builtin.assert:
+        that: service_scope in ["user", "system"]
+        fail_msg: |
+          ERROR: Invalid service_scope value '{{ service_scope }}'!
+          Valid values: "user" (default) or "system"
+
+          User services: Run per-user, managed by user, no root required
+          System services: Global services, require root for management
+
+          Set with: -e "service_scope=user" or -e "service_scope=system"
+
+    # Verify the source directory exists before attempting to package it
+    - name: Validate local_src_dir exists
+      ansible.builtin.stat:
+        path: "{{ local_src_dir }}"
+      register: local_src_stat
+      delegate_to: localhost
+      become: no
+
+    # Fail fast if source directory doesn't exist
+    - name: Validate local_src_dir exists on filesystem
+      ansible.builtin.assert:
+        that: local_src_stat.stat.exists
+        fail_msg: "ERROR: local_src_dir '{{ local_src_dir }}' does not exist on the local machine!"
+
+    # =================================================================================
+    # PACKAGING PHASE: Create deployment archive on control machine
+    # =================================================================================
+
+    # Package source code excluding development files and directories
+    # Runs on control machine (localhost) to avoid network transfer overhead
+    - name: Create archive of source code on control machine
+      ansible.builtin.command:
+        cmd: >
+          tar -czf {{ local_tmp_archive }}
+          --exclude='.git'
+          --exclude='.venv'
+          --exclude='venv'
+          --exclude='__pycache__'
+          --exclude='.pytest_cache'
+          --exclude='.ruff_cache'
+          --exclude='.DS_Store'
+          --exclude='NOTES.txt'
+          .
+        chdir: "{{ local_src_dir }}"
+      delegate_to: localhost
+      become: no
+
+    # =================================================================================
+    # DEPLOYMENT PHASE: Transfer and extract code on remote server
+    # =================================================================================
+
+    # Create base directory structure on remote server
+    - name: Ensure remote deployment base directory exists
+      ansible.builtin.file:
+        path: "{{ remote_deploy_base }}"
+        state: directory
+        mode: '0755'
+
+    # Create timestamped release directory for this deployment
+    - name: Create remote release directory
+      ansible.builtin.file:
+        path: "{{ release_dir }}"
+        state: directory
+        mode: '0755'
+
+    # Transfer the packaged archive to remote server
+    - name: Copy archive to remote server
+      ansible.builtin.copy:
+        src: "{{ local_tmp_archive }}"
+        dest: "{{ remote_tmp_archive }}"
+        mode: '0644'
+
+    # Extract archive contents into the release directory
+    - name: Unpack archive on remote server
+      ansible.builtin.unarchive:
+        src: "{{ remote_tmp_archive }}"
+        dest: "{{ release_dir }}"
+        remote_src: yes
+
+    # Atomically update the 'current' symlink to point to new release
+    # This provides zero-downtime deployment as symlink update is instant
+    - name: Update 'current' symlink to point to the new release
+      ansible.builtin.file:
+        src: "{{ release_dir }}"
+        dest: "{{ current_symlink }}"
+        state: link
+        force: yes # Replaces the symlink if it already exists
+
+    # =================================================================================
+    # SERVICE CONFIGURATION PHASE: Set up systemd service (user or system scope)
+    # =================================================================================
+
+    # Create systemd configuration directory based on service scope
+    - name: Ensure systemd user directory exists
+      ansible.builtin.file:
+        path: "/home/{{ deploy_user }}/.config/systemd/user"
+        state: directory
+        mode: '0755'
+      become: yes
+      become_user: "{{ deploy_user }}"
+      when: service_scope == "user"
+
+    # Deploy the systemd service unit file for the FastAPI application
+    # Supports both user services (~/.config/systemd/user/) and system services (/etc/systemd/system/)
+    # Uses Jinja2 templating to populate dynamic paths based on deploy_user, remote_deploy_base, and project_name
+    # User services: Run per-user, managed by user, no root required for management
+    # System services: Global services, require root for management, run as specified user
+    # Triggers appropriate handlers based on service scope
+    - name: Template systemd service file (user scope)
+      ansible.builtin.template:
+        src: "{{ local_src_dir }}/fastapi-db.service.j2"
+        dest: "/home/{{ deploy_user }}/.config/systemd/user/fastapi-db.service"
+        mode: '0644'
+      notify:
+        - reload systemd user
+        - restart fastapi-db user service
+      become: yes
+      become_user: "{{ deploy_user }}"
+      when: service_scope == "user"
+
+    - name: Template systemd service file (system scope)
+      ansible.builtin.template:
+        src: "{{ local_src_dir }}/fastapi-db.service.j2"
+        dest: "/etc/systemd/system/fastapi-db.service"
+        mode: '0644'
+      notify:
+        - reload systemd system
+        - restart fastapi-db system service
+      become: yes
+      when: service_scope == "system"
+
+    # =================================================================================
+    # SYSTEMD SETUP PHASE: Configure systemd environment (user or system scope)
+    # =================================================================================
+
+    # USER SCOPE: Configure user systemd environment
+    # Get numeric user ID for systemd user manager service name
+    - name: Get UID of deploy user
+      ansible.builtin.command:
+        cmd: id -u {{ deploy_user }}
+      register: deploy_uid
+      changed_when: false
+      when: service_scope == "user"
+
+    # Ensure the user's systemd manager is running and enabled (required for user services)
+    - name: Ensure user systemd manager is running
+      ansible.builtin.systemd:
+        name: "user@{{ deploy_uid.stdout }}.service"
+        state: started
+        enabled: yes
+      become: yes
+      when: service_scope == "user"
+
+    # Check if user lingering is enabled (allows user services to run without active session)
+    - name: Check if user lingering file exists
+      ansible.builtin.stat:
+        path: "/var/lib/systemd/linger/{{ deploy_user }}"
+      register: linger_file
+      when: service_scope == "user"
+
+    # Enable lingering for SSH users to allow services to run without active login
+    - name: Enable lingering for SSH user
+      ansible.builtin.command:
+        cmd: loginctl enable-linger {{ deploy_user }}
+      when: service_scope == "user" and not linger_file.stat.exists
+      become: yes
+
+    # Reload systemd daemon based on service scope
+    - name: Reload user systemd units
+      ansible.builtin.systemd:
+        daemon_reload: yes
+        scope: user
+      become: yes
+      become_user: "{{ deploy_user }}"
+      when: service_scope == "user"
+
+    - name: Reload system systemd units
+      ansible.builtin.systemd:
+        daemon_reload: yes
+      become: yes
+      when: service_scope == "system"
+
+    # Enable and start the FastAPI service based on scope
+    - name: Enable and start the user service
+      ansible.builtin.systemd:
+        name: fastapi-db
+        enabled: yes
+        state: started
+        scope: user
+        daemon_reload: yes
+      become: yes
+      become_user: "{{ deploy_user }}"
+      when: service_scope == "user"
+
+    - name: Enable and start the system service
+      ansible.builtin.systemd:
+        name: fastapi-db
+        enabled: yes
+        state: started
+        daemon_reload: yes
+      become: yes
+      when: service_scope == "system"
+
+    # =================================================================================
+    # CLEANUP PHASE: Remove temporary files
+    # =================================================================================
+
+    # Remove temporary archive from remote server
+    - name: Clean up temp archive on remote
+      ansible.builtin.file:
+        path: "{{ remote_tmp_archive }}"
+        state: absent
+
+    # Remove temporary archive from control machine
+    - name: Clean up local archive
+      ansible.builtin.file:
+        path: "{{ local_tmp_archive }}"
+        state: absent
+      delegate_to: localhost
+      become: no
+
+  # =================================================================================
+  # EVENT HANDLERS: Triggered by changes to service files (user or system scope)
+  # =================================================================================
+  handlers:
+    # Reload systemd user daemon when user service unit files change
+    - name: reload systemd user
+      ansible.builtin.systemd:
+        daemon_reload: yes
+        scope: user
+      become: yes
+      become_user: "{{ deploy_user }}"
+      when: service_scope == "user"
+
+    # Reload systemd system daemon when system service unit files change
+    - name: reload systemd system
+      ansible.builtin.systemd:
+        daemon_reload: yes
+      become: yes
+      when: service_scope == "system"
+
+    # Restart FastAPI user service when configuration changes
+    - name: restart fastapi-db user service
+      ansible.builtin.systemd:
+        name: fastapi-db
+        state: restarted
+        scope: user
+      become: yes
+      become_user: "{{ deploy_user }}"
+      when: service_scope == "user"
+
+    # Restart FastAPI system service when configuration changes
+    - name: restart fastapi-db system service
+      ansible.builtin.systemd:
+        name: fastapi-db
+        state: restarted
+      become: yes
+      when: service_scope == "system"

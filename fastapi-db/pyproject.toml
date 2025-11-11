@@ -19,6 +19,7 @@ dependencies = [
     "typer>=0.16.0",
     "mypy>=1.10.0",
     "fastapi-mcp>=0.4.0",
+    "ansible>=12.2.0",
 ]
 
 [tool.setuptools.packages]
