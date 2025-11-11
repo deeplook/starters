@@ -17,6 +17,8 @@ if [ -n "$MYAPP_ENV_PATH" ]; then
     export $(cat "$MYAPP_ENV_PATH" | grep -v '^#' | xargs)
 fi
 
+export MYAPP_SERVER_NAME="127.0.0.1"
+
 # Ensure a clean slate by deleting the old database file
 DB_FILE=$(echo $MYAPP_DATABASE_URL | sed 's/sqlite:\/\///')
 echo "Deleting old database file: $DB_FILE"
@@ -30,11 +32,11 @@ echo "MYAPP_DATABASE_URL: $MYAPP_DATABASE_URL"
 
 
 echo "Get all items (should be empty)"
-curl -s -X GET http://127.0.0.1:$MYAPP_PORT/items
+curl -s -X GET http://MYAPP_SERVER_NAME:$MYAPP_PORT/items
 
 
 echo "Create a new item"
-response=$(curl -s -X POST http://127.0.0.1:$MYAPP_PORT/items -H "Content-Type: application/json" \
+response=$(curl -s -X POST http://MYAPP_SERVER_NAME:$MYAPP_PORT/items -H "Content-Type: application/json" \
     -d '{"name": "Test Item", "description": "A test item"}')
 echo $response
 item_id=$(echo $response | jq '.id')
@@ -42,30 +44,30 @@ echo "Created item with ID: $item_id"
 
 
 echo "Get the new item"
-curl -s -X GET http://127.0.0.1:$MYAPP_PORT/items/$item_id
+curl -s -X GET http://MYAPP_SERVER_NAME:$MYAPP_PORT/items/$item_id
 
 
 echo "Update the item"
-curl -s -X PUT http://127.0.0.1:$MYAPP_PORT/items/$item_id -H "Content-Type: application/json"\
+curl -s -X PUT http://MYAPP_SERVER_NAME:$MYAPP_PORT/items/$item_id -H "Content-Type: application/json"\
     -d '{"name": "Updated Item", "description": "This item has been updated"}'
 
 
 echo "Partially update the item"
-curl -s -X PATCH http://127.0.0.1:$MYAPP_PORT/items/$item_id -H "Content-Type: application/json" \
+curl -s -X PATCH http://MYAPP_SERVER_NAME:$MYAPP_PORT/items/$item_id -H "Content-Type: application/json" \
     -d '{"name": "Patched Item Name"}'
 
 
 echo "Delete the item"
-curl -s -X DELETE http://127.0.0.1:$MYAPP_PORT/items/$item_id
+curl -s -X DELETE http://MYAPP_SERVER_NAME:$MYAPP_PORT/items/$item_id
 
 
 echo "Verify the item was deleted"
-curl -s -X GET http://127.0.0.1:$MYAPP_PORT/items/$item_id
+curl -s -X GET http://MYAPP_SERVER_NAME:$MYAPP_PORT/items/$item_id
 
 
 echo "Get available methods for /items (OPTIONS)"
-curl -s -i -X OPTIONS http://127.0.0.1:$MYAPP_PORT/items
+curl -s -i -X OPTIONS http://MYAPP_SERVER_NAME:$MYAPP_PORT/items
 
 
 echo "Get headers for /items (HEAD)"
-curl -s --head http://127.0.0.1:$MYAPP_PORT/items
+curl -s --head http://MYAPP_SERVER_NAME:$MYAPP_PORT/items
