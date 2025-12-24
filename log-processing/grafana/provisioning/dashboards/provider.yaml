@@ -1,0 +1,15 @@
+apiVersion: 1
+
+# Note: `options.path` must be an absolute path. `run_all.sh` installs a
+# rendered copy of this file into Homebrew Grafana's provisioning dir, with
+# the correct absolute path for your Homebrew prefix.
+providers:
+  - name: mac_stats
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: __DASHBOARDS_PATH__
+      foldersFromFilesStructure: false

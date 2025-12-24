@@ -6,6 +6,14 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT_DIR"
 
+# Determine Homebrew prefix for paths (macOS Intel vs Apple Silicon)
+ARCH=$(uname -m)
+if [ "$ARCH" = "arm64" ]; then
+  BREW_PREFIX="/opt/homebrew"
+else
+  BREW_PREFIX="/usr/local"
+fi
+
 # Function to clean up background processes
 cleanup() {
     echo -e "\nShutting down services..."
@@ -41,6 +49,60 @@ if ! command -v promtail >/dev/null 2>&1; then
   exit 1
 fi
 
+ensure_grafana_provisioning() {
+  # Install provisioning files into Homebrew Grafana so first-run has:
+  # - Loki datasource named "Loki" (http://localhost:3100)
+  # - Mac stats dashboard from mac_stats_dashboard.json
+  local grafana_provisioning_dir="$BREW_PREFIX/etc/grafana/provisioning"
+  local ds_dir="$grafana_provisioning_dir/datasources"
+  local dashboards_dir="$grafana_provisioning_dir/dashboards"
+
+  local repo_ds="$ROOT_DIR/grafana/provisioning/datasources/loki.yaml"
+  local repo_provider_tpl="$ROOT_DIR/grafana/provisioning/dashboards/provider.yaml"
+  local repo_dashboard="$ROOT_DIR/mac_stats_dashboard.json"
+
+  if [ ! -f "$repo_ds" ] || [ ! -f "$repo_provider_tpl" ] || [ ! -f "$repo_dashboard" ]; then
+    echo "Error: Grafana provisioning files missing in repo." >&2
+    echo "Expected:" >&2
+    echo "  $repo_ds" >&2
+    echo "  $repo_provider_tpl" >&2
+    echo "  $repo_dashboard" >&2
+    exit 1
+  fi
+
+  if ! mkdir -p "$ds_dir" "$dashboards_dir" >/dev/null 2>&1; then
+    echo "Error: Cannot create Grafana provisioning dirs under $BREW_PREFIX/etc/grafana." >&2
+    echo "Fix with:" >&2
+    echo "  sudo mkdir -p \"$ds_dir\" \"$dashboards_dir\"" >&2
+    echo "  sudo chown -R $(whoami):admin \"$BREW_PREFIX/etc/grafana\"" >&2
+    exit 1
+  fi
+
+  # Datasource
+  if ! cp "$repo_ds" "$ds_dir/loki.yaml" >/dev/null 2>&1; then
+    echo "Error: Cannot write Grafana datasource provisioning file: $ds_dir/loki.yaml" >&2
+    echo "Fix with:" >&2
+    echo "  sudo cp \"$repo_ds\" \"$ds_dir/loki.yaml\"" >&2
+    exit 1
+  fi
+
+  # Dashboard JSON
+  if ! cp "$repo_dashboard" "$dashboards_dir/mac_stats_dashboard.json" >/dev/null 2>&1; then
+    echo "Error: Cannot write Grafana dashboard file: $dashboards_dir/mac_stats_dashboard.json" >&2
+    echo "Fix with:" >&2
+    echo "  sudo cp \"$repo_dashboard\" \"$dashboards_dir/mac_stats_dashboard.json\"" >&2
+    exit 1
+  fi
+
+  # Dashboard provider (render absolute path)
+  if ! sed "s|__DASHBOARDS_PATH__|$dashboards_dir|g" "$repo_provider_tpl" > "$dashboards_dir/provider.yaml" 2>/dev/null; then
+    echo "Error: Cannot render Grafana dashboard provider config." >&2
+    echo "Fix with:" >&2
+    echo "  sudo sh -c 'sed \"s|__DASHBOARDS_PATH__|$dashboards_dir|g\" \"$repo_provider_tpl\" > \"$dashboards_dir/provider.yaml\"'" >&2
+    exit 1
+  fi
+}
+
 
 # --- Script Execution ---
 echo "Starting Loki via Homebrew services..."
@@ -58,6 +120,9 @@ if ! brew services list | grep -q "loki.*started"; then
 fi
 echo "Loki service is running."
 
+echo "Installing Grafana provisioning (Loki datasource + Mac Stats dashboard)..."
+ensure_grafana_provisioning
+
 echo "Starting Grafana via Homebrew services..."
 if ! brew services list | grep -q "grafana.*started"; then
   if ! brew services start grafana; then
@@ -65,6 +130,9 @@ if ! brew services list | grep -q "grafana.*started"; then
     echo "Try: brew services cleanup && brew services start grafana" >&2
     exit 1
   fi
+else
+  # Ensure new/updated provisioning files are picked up.
+  brew services restart grafana >/dev/null 2>&1 || true
 fi
 echo "Grafana service is running."
 # Promtail needs to be able to write its positions file. If you previously ran
@@ -92,13 +160,6 @@ echo "mac_stats.py started with PID $MAC_STATS_PID"
 
 echo -e "\nAll services are running."
 echo "Grafana UI: http://localhost:3000"
-
-ARCH=$(uname -m)
-if [ "$ARCH" = "arm64" ]; then
-  BREW_PREFIX="/opt/homebrew"
-else
-  BREW_PREFIX="/usr/local"
-fi
 echo "Loki logs: $BREW_PREFIX/var/log/loki.log"
 echo "Grafana logs: $BREW_PREFIX/var/log/grafana/grafana.log"
 echo "Promtail logs: $ROOT_DIR/promtail.log"

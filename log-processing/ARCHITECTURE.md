@@ -25,7 +25,7 @@ The system is a local log aggregation and visualization pipeline composed of fou
 ### B. Promtail (Collector)
 *   **Role**: Reads the log file and pushes to Loki.
 *   **Configuration**: `promtail-local-config.yaml`
-    *   **Positions**: Stores reading offsets in `positions.yaml` to survive restarts.
+    *   **Positions**: Stores reading offsets in `.promtail-positions.yaml` to survive restarts.
     *   **Scrape Config**:
         *   Tails: `mac_stats.log`
         *   Job Name: `macbook_stats`
@@ -42,9 +42,11 @@ The system is a local log aggregation and visualization pipeline composed of fou
 ### D. Grafana (UI)
 *   **Role**: Visualizes the data.
 *   **Configuration**:
-    *   **Datasource**: Configured via UI to point to Loki (`http://localhost:3100`).
-    *   **Dashboard**: `mac_stats_dashboard.json` contains the panel definitions and LogQL queries.
+    *   **Datasource**: Provisioned as `Loki` pointing to `http://localhost:3100`.
+    *   **Dashboard**: Provisioned from `mac_stats_dashboard.json` (panel definitions and LogQL queries).
 *   **Access**: `http://localhost:3000`
+*   **Provisioning Source (repo)**: `grafana/provisioning/`
+*   **Provisioning Install (Homebrew)**: `$BREW_PREFIX/etc/grafana/provisioning/` (installed/updated by `run_all.sh`)
 
 ### E. Logrotate (System Health)
 *   **Role**: Rotates Loki's internal service logs to prevent disk fill-up.
@@ -84,20 +86,21 @@ graph LR
 ## 4. Lifecycle Management
 
 ### Starting the Pipeline
-The system can be started in two main modes:
+The system is started in **Service Mode**:
 
-1.  **Fully Local (Dev Mode)**:
-    *   Command: `make run-all` (executes `scripts/run_all_processes.sh`)
-    *   Behavior: Starts Loki, Promtail, and `mac_stats.py` as background processes within the current shell session.
-
-2.  **Hybrid (Service Mode)**:
-    *   Command: `make run` (executes `run_all.sh`)
-    *   Behavior: Assumes Loki and Grafana are running as system services (via `brew services start ...`). Only starts the user-space tools (Promtail and `mac_stats.py`) locally.
+*   **Command**: `make run` (executes `run_all.sh`)
+*   **Behavior**:
+    *   Ensures **Loki** is started via `brew services`.
+    *   Installs/updates **Grafana provisioning** (Loki datasource + Mac Stats dashboard) into Homebrew Grafana’s provisioning directory.
+    *   Ensures **Grafana** is started via `brew services` (and restarts it when provisioning changes).
+    *   Starts **Promtail** and **`mac_stats.py`** locally in the current shell session.
 
 ### Stopping the Pipeline
-*   **Local Mode**: `Ctrl+C` in the terminal running the script. The script traps the signal and kills the background PIDs (`kill $PID`).
-*   **Service Mode**: `Ctrl+C` stops the local scripts. System services must be stopped separately (`brew services stop loki`).
+*   `Ctrl+C` stops the local scripts (Promtail and `mac_stats.py`).
+*   System services must be stopped separately:
+    *   `brew services stop loki`
+    *   `brew services stop grafana`
 
 ### Persistence
-*   **Promtail**: Remembers where it left off reading `mac_stats.log` using `positions.yaml`.
+*   **Promtail**: Remembers where it left off reading `mac_stats.log` using `.promtail-positions.yaml`.
 *   **Loki**: Persists data in its configured storage directory (`.loki-data` or `/tmp`). detailed in `loki-local-config.yaml`.
