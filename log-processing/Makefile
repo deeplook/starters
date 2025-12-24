@@ -1,14 +1,13 @@
 # Makefile for log-processing project
 
-.PHONY: help install test run run-all loki-dev smoke-test start-grafana stop-grafana clean
+.PHONY: help install test run loki-dev smoke-test start-grafana stop-grafana clean
 
 # Default target
 help:
 	@echo "Available targets:"
 	@echo "  install       - Install dependencies using uv"
 	@echo "  test          - Run tests using pytest"
-	@echo "  run           - Run mac_stats and promtail (assumes Loki via brew)"
-	@echo "  run-all       - Run Loki, Promtail, and mac_stats locally"
+	@echo "  run           - Run mac_stats and promtail (assumes Loki and Grafana via brew)"
 	@echo "  loki-dev      - Run Loki locally with local config"
 	@echo "  start-grafana - Start Grafana via Homebrew services"
 	@echo "  stop-grafana  - Stop Grafana via Homebrew services"
@@ -23,9 +22,6 @@ test:
 
 run:
 	bash ./run_all.sh
-
-run-all:
-	bash ./scripts/run_all_processes.sh
 
 loki-dev:
 	./scripts/loki_dev.sh
