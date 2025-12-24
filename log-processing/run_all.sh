@@ -9,9 +9,8 @@ cd "$ROOT_DIR"
 # Function to clean up background processes
 cleanup() {
     echo -e "\nShutting down services..."
-    # Use pkill to reliably terminate the processes by name
-    pkill -f "promtail-local-config.yaml" || true
-    pkill -f "mac_stats.py" || true
+    kill "${PROMTAIL_PID:-}" >/dev/null 2>&1 || true
+    kill "${MAC_STATS_PID:-}" >/dev/null 2>&1 || true
     sleep 1 # Give processes a moment to terminate
     echo "Services stopped."
     echo "To stop Loki, run: brew services stop loki"
@@ -23,45 +22,51 @@ cleanup() {
 trap cleanup INT
 
 # --- Service Management ---
-# Check for Homebrew
-if ! command -v brew >/dev/null 2>&1;
-then
-  echo "Error: Homebrew not found. Please install it to manage the Loki service." >&2
+# We start Loki and Grafana via Homebrew services.
+if ! command -v brew >/dev/null 2>&1; then
+  echo "Error: Homebrew not found. Please install it to manage Loki/Grafana services." >&2
   exit 1
 fi
 
-# Check and start Loki service
-if ! brew services list | grep -q "loki.*started";
-then
-    echo "Loki service not running. Starting with Homebrew..."
-    brew services start loki
+if ! brew list loki >/dev/null 2>&1; then
+  echo "Error: loki is not installed. Install it with: brew install loki" >&2
+  exit 1
 fi
-echo "Loki service is running."
-
-# Check and start Grafana service (required for http://localhost:3000)
 if ! brew list grafana >/dev/null 2>&1; then
-  echo "Error: Grafana is not installed. Install it with: brew install grafana" >&2
+  echo "Error: grafana is not installed. Install it with: brew install grafana" >&2
   exit 1
 fi
-if ! brew services list | grep -q "grafana.*started";
-then
-    echo "Grafana service not running. Starting with Homebrew..."
-    brew services start grafana
-fi
-echo "Grafana service is running."
-
-# Stop and disable the Promtail service if it's active
-if brew services list | grep -q "promtail";
-then
-    if brew services list | grep -q "promtail.*started";
-then
-        echo "Stopping conflicting Promtail Homebrew service..."
-        brew services stop promtail
-    fi
+if ! command -v promtail >/dev/null 2>&1; then
+  echo "Error: promtail not found in PATH. Install it (e.g. via Homebrew: brew install promtail)." >&2
+  exit 1
 fi
 
 
 # --- Script Execution ---
+echo "Starting Loki via Homebrew services..."
+if ! brew services list | grep -q "loki.*started"; then
+  if ! brew services start loki; then
+    echo "Error: Failed to start Loki via brew services." >&2
+    echo "If you see 'launchctl bootstrap ... exited with 5', try:" >&2
+    echo "  brew services stop loki || true" >&2
+    echo "  brew services cleanup" >&2
+    echo "  launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/homebrew.mxcl.loki.plist 2>/dev/null || true" >&2
+    echo "  rm -f ~/Library/LaunchAgents/homebrew.mxcl.loki.plist" >&2
+    echo "  brew services start loki" >&2
+    exit 1
+  fi
+fi
+echo "Loki service is running."
+
+echo "Starting Grafana via Homebrew services..."
+if ! brew services list | grep -q "grafana.*started"; then
+  if ! brew services start grafana; then
+    echo "Error: Failed to start Grafana via brew services." >&2
+    echo "Try: brew services cleanup && brew services start grafana" >&2
+    exit 1
+  fi
+fi
+echo "Grafana service is running."
 # Promtail needs to be able to write its positions file. If you previously ran
 # this script with sudo, positions.yaml may be owned by root and Promtail will fail.
 POSITIONS_FILE="$ROOT_DIR/.promtail-positions.yaml"
@@ -88,14 +93,12 @@ echo "mac_stats.py started with PID $MAC_STATS_PID"
 echo -e "\nAll services are running."
 echo "Grafana UI: http://localhost:3000"
 
-# Determine Homebrew prefix for log paths
 ARCH=$(uname -m)
 if [ "$ARCH" = "arm64" ]; then
-    BREW_PREFIX="/opt/homebrew"
+  BREW_PREFIX="/opt/homebrew"
 else
-    BREW_PREFIX="/usr/local"
+  BREW_PREFIX="/usr/local"
 fi
-
 echo "Loki logs: $BREW_PREFIX/var/log/loki.log"
 echo "Grafana logs: $BREW_PREFIX/var/log/grafana/grafana.log"
 echo "Promtail logs: $ROOT_DIR/promtail.log"

@@ -102,7 +102,7 @@
           "legendFormat": "CPU Usage (%)",
           "metric": "",
           "query": "avg_over_time({job=\"macbook_stats\"} | json | unwrap cpu_usage_percent [$__interval])",
-          "refId": "",
+          "refId": "A",
           "step": 10,
           "target": ""
         }
@@ -205,7 +205,7 @@
           "legendFormat": "Memory Free (%)",
           "metric": "",
           "query": "avg_over_time({job=\"macbook_stats\"} | json | unwrap memory_free_percent [$__interval])",
-          "refId": "",
+          "refId": "A",
           "step": 10,
           "target": ""
         }
@@ -308,7 +308,7 @@
           "legendFormat": "{{power_source}}",
           "metric": "",
           "query": "avg_over_time({job=\"macbook_stats\"} | json | unwrap battery_percentage [$__interval]) by (power_source)",
-          "refId": "",
+          "refId": "A",
           "step": 10,
           "target": ""
         }
