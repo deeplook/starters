@@ -52,14 +52,14 @@ fi
 ensure_grafana_provisioning() {
   # Install provisioning files into Homebrew Grafana so first-run has:
   # - Loki datasource named "Loki" (http://localhost:3100)
-  # - Mac stats dashboard from mac_stats_dashboard.json
+  # - Mac stats dashboard from grafana/dashboards/mac_stats_dashboard.json
   local grafana_provisioning_dir="$BREW_PREFIX/etc/grafana/provisioning"
   local ds_dir="$grafana_provisioning_dir/datasources"
   local dashboards_dir="$grafana_provisioning_dir/dashboards"
 
   local repo_ds="$ROOT_DIR/grafana/provisioning/datasources/loki.yaml"
   local repo_provider_tpl="$ROOT_DIR/grafana/provisioning/dashboards/provider.yaml"
-  local repo_dashboard="$ROOT_DIR/mac_stats_dashboard.json"
+  local repo_dashboard="$ROOT_DIR/grafana/dashboards/mac_stats_dashboard.json"
 
   if [ ! -f "$repo_ds" ] || [ ! -f "$repo_provider_tpl" ] || [ ! -f "$repo_dashboard" ]; then
     echo "Error: Grafana provisioning files missing in repo." >&2

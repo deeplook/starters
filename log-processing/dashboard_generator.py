@@ -66,11 +66,11 @@ def main():
         dashboard.to_json_data(), sort_keys=True, indent=2, cls=DashboardEncoder
     )
 
-    # Save to file
-    with open("mac_stats_dashboard.json", "w") as f:
+    # Save to file (kept under grafana/ for provisioning/import)
+    with open("grafana/dashboards/mac_stats_dashboard.json", "w") as f:
         f.write(dashboard_json)
 
-    print("Dashboard JSON saved to mac_stats_dashboard.json")
+    print("Dashboard JSON saved to grafana/dashboards/mac_stats_dashboard.json")
 
 
 if __name__ == "__main__":

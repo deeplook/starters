@@ -43,7 +43,7 @@ The system is a local log aggregation and visualization pipeline composed of fou
 *   **Role**: Visualizes the data.
 *   **Configuration**:
     *   **Datasource**: Provisioned as `Loki` pointing to `http://localhost:3100`.
-    *   **Dashboard**: Provisioned from `mac_stats_dashboard.json` (panel definitions and LogQL queries).
+    *   **Dashboard**: Provisioned from `grafana/dashboards/mac_stats_dashboard.json` (panel definitions and LogQL queries).
 *   **Access**: `http://localhost:3000`
 *   **Provisioning Source (repo)**: `grafana/provisioning/`
 *   **Provisioning Install (Homebrew)**: `$BREW_PREFIX/etc/grafana/provisioning/` (installed/updated by `run_all.sh`)
