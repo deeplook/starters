@@ -128,9 +128,15 @@ e2e:
 
 .PHONY: clean
 clean:
+	@echo "Cleaning local build artifacts and Terraform caches..."
+	@# Remove build artifacts
 	rm -f lambda_function.zip
 	rm -f test-image.jpg
 	rm -f .tf_outputs.env
-	rm -rf terraform/.terraform*
-	rm -rf __pycache__
+	@# Remove all Terraform provider caches (both root and modules)
+	find terraform -type d -name ".terraform" -exec rm -rf {} + 2>/dev/null || true
+	@# Remove Python cache files
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 	rm -rf .ruff_cache
+	@echo "Clean complete."
