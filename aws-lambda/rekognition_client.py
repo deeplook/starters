@@ -4,6 +4,7 @@ AWS Rekognition Client
 This script uploads a file to an S3 bucket and uses AWS Rekognition to detect faces in the image.
 """
 
+import os
 import sys
 
 import boto3
@@ -14,7 +15,7 @@ def upload_to_s3(bucket_name: str, file_path: str) -> bool:
     """Uploads a file to an S3 bucket."""
     s3 = boto3.client("s3")
     try:
-        file_name = file_path.split("/")[-1]
+        file_name = os.path.basename(file_path)
         s3.upload_file(file_path, bucket_name, file_name)
         print(f"Upload Successful: '{file_path}' to '{bucket_name}'.")
         return True
