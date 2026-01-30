@@ -19,7 +19,8 @@ resource "aws_s3_bucket" "image_bucket" {
 }
 
 module "lambda_function" {
-  source = "./modules/lambda_function"
+  source        = "./modules/lambda_function"
+  s3_bucket_arn = aws_s3_bucket.image_bucket.arn
 }
 
 resource "aws_lambda_permission" "allow_s3" {

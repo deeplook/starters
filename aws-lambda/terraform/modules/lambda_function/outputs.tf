@@ -10,3 +10,7 @@ output "lambda_function_arn" {
 output "lambda_policy_id" {
   value = aws_iam_role_policy.lambda_policy.id
 }
+
+output "lambda_role_arn" {
+  value = aws_iam_role.lambda_exec_role.arn
+}
