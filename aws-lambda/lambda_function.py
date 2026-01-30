@@ -9,10 +9,32 @@ def lambda_handler(event, context):
     """
     print("Lambda function started.")
 
-    # Get the bucket and key from the S3 event
-    s3_event = event["Records"][0]["s3"]
-    bucket_name = s3_event["bucket"]["name"]
-    object_key = urllib.parse.unquote_plus(s3_event["object"]["key"], encoding="utf-8")
+    # Validate event structure
+    if not event.get("Records") or len(event["Records"]) == 0:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"message": "Invalid event: no Records found"}),
+        }
+
+    s3_event = event["Records"][0].get("s3")
+    if not s3_event:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"message": "Invalid event: no S3 event found"}),
+        }
+
+    bucket_name = s3_event.get("bucket", {}).get("name")
+    object_key = s3_event.get("object", {}).get("key")
+
+    if not bucket_name or not object_key:
+        return {
+            "statusCode": 400,
+            "body": json.dumps(
+                {"message": "Invalid event: missing bucket name or object key"}
+            ),
+        }
+
+    object_key = urllib.parse.unquote_plus(object_key, encoding="utf-8")
 
     print(f"Processing object {object_key} from bucket {bucket_name}")
 
