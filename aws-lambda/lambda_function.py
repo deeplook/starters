@@ -4,6 +4,18 @@ import urllib.parse
 import boto3
 from botocore.exceptions import ClientError, EndpointConnectionError, NoCredentialsError
 
+# Initialize boto3 client outside the handler for connection reuse across invocations
+# Lambda containers are frozen/thawed, so this client persists between warm invocations
+_REKOGNITION_CLIENT = None
+
+
+def _get_rekognition_client():
+    """Get or create the Rekognition client (singleton pattern)."""
+    global _REKOGNITION_CLIENT
+    if _REKOGNITION_CLIENT is None:
+        _REKOGNITION_CLIENT = boto3.client("rekognition")
+    return _REKOGNITION_CLIENT
+
 
 def lambda_handler(event, context):
     """
@@ -40,7 +52,7 @@ def lambda_handler(event, context):
 
     print(f"Processing object {object_key} from bucket {bucket_name}")
 
-    rekognition = boto3.client("rekognition")
+    rekognition = _get_rekognition_client()
 
     try:
         response = rekognition.detect_labels(
