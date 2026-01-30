@@ -45,7 +45,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "logs:PutLogEvents"
         ]
         Effect   = "Allow"
-        Resource = "arn:aws:logs:*:*:*"
+        Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/rekognition-lambda:*"
       },
       {
         Action   = "rekognition:DetectLabels"
