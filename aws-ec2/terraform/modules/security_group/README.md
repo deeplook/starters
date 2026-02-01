@@ -26,6 +26,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_allowed_ssh_cidr"></a> [allowed\_ssh\_cidr](#input\_allowed\_ssh\_cidr) | CIDR block allowed to access SSH (port 22). Use your IP with /32 suffix (e.g., '203.0.113.1/32'). Set to '0.0.0.0/0' only for testing. | `string` | `"0.0.0.0/0"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | n/a | `string` | n/a | yes |
 
 ## Outputs

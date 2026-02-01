@@ -19,8 +19,9 @@ variable "instance_type" {
 }
 
 variable "ami_id" {
-  description = "The ID of the AMI to use for the EC2 instance."
+  description = "The ID of the AMI to use for the EC2 instance. If not specified, the latest Amazon Linux 2 AMI will be used."
   type        = string
+  default     = null
 }
 
 variable "ec2_volume_size" {
@@ -32,4 +33,10 @@ variable "environment" {
   description = "Environment name to suffix resource identifiers and tags (e.g., prod, staging, e2e-test)."
   type        = string
   default     = "prod"
+}
+
+variable "allowed_ssh_cidr" {
+  description = "CIDR block allowed to access SSH (port 22). Use your IP with /32 suffix (e.g., '203.0.113.1/32'). Set to '0.0.0.0/0' only for testing."
+  type        = string
+  default     = "0.0.0.0/0"
 }
