@@ -1,18 +1,22 @@
 
 
+resource "random_id" "key_suffix" {
+  byte_length = 4
+}
+
 resource "tls_private_key" "ec2_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "ec2_key_pair" {
-  key_name   = "tf-generated-key-pair-part-2"
+  key_name   = "${var.key_name_prefix}-${random_id.key_suffix.hex}"
   public_key = tls_private_key.ec2_key.public_key_openssh
 }
 
 resource "local_file" "private_key" {
   content         = tls_private_key.ec2_key.private_key_pem
-  filename        = "${path.module}/tf-generated-key-pair-part-2.pem"
+  filename        = "${path.module}/${var.key_name_prefix}-${random_id.key_suffix.hex}.pem"
   file_permission = "0400"
 }
 
@@ -33,10 +37,30 @@ resource "aws_instance" "main" {
 
   user_data = <<EOF
 #!/bin/bash
-yum update -y
-amazon-linux-extras install docker -y
-systemctl start docker
-systemctl enable docker
-docker run -d -p 80:80 nginx
+set -x  # Log commands for debugging
+
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
+echo "Starting user data script..."
+
+# Run commands without set -e to ensure nginx starts even if some commands have non-zero exit
+yum update -y || true
+amazon-linux-extras install docker -y || true
+systemctl start docker || true
+systemctl enable docker || true
+usermod -a -G docker ec2-user 2>/dev/null || true  # Add ec2-user to docker group (may already exist)
+
+# Ensure docker is running before starting nginx
+for i in {1..10}; do
+  if systemctl is-active --quiet docker; then
+    break
+  fi
+  echo "Waiting for docker to start..."
+  sleep 2
+done
+
+docker run -d -p 80:80 nginx || true
+
+echo "User data script completed"
 EOF
 }

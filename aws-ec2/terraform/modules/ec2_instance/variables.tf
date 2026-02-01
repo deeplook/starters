@@ -22,3 +22,9 @@ variable "volume_size" {
   description = "The size of the root EBS volume in GB. For development (8-16 GB), staging (16-32 GB), or production (32+ GB). Note that costs increase with size and IOPS. Using gp3 volume type for better price/performance ratio."
   type        = number
 }
+
+variable "key_name_prefix" {
+  description = "Prefix for the generated SSH key pair name. A random suffix will be added for uniqueness."
+  type        = string
+  default     = "tf-key"
+}
